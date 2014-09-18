@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sachsmc/rclinicaltrials.png?branch=master)](https://travis-ci.org/sachsmc/rclinicaltrials)
+
 ## R interface to clinicaltrials.gov
 
 [Clinicaltrials.gov](http://clinicaltrials.gov) ClinicalTrials.gov is a registry and results database of publicly and privately supported clinical studies of human participants conducted around the world. Users can search for information about and results from those trials. This package provides a set of functions to interact with the search and download features. Results are downloaded to temporary directories and returned as R objects.
