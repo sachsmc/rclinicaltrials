@@ -29,6 +29,6 @@ includes results of completed trials.
 }
 \examples{
 # trials satisfying 'heart disease AND stroke AND California'
-clinicaltrials_download(query = 'heart disease AND stroke AND California')
+clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)
 }
 

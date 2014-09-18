@@ -18,7 +18,7 @@
 #' clinicaltrials_search(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))
 #'
 #' # limit to 10 results
-#' clinicaltrials_search(query = "cancer", count = 10)
+#' clinicaltrials_search(query = "colon cancer", count = 10)
 #'
 #'
 clinicaltrials_search <-
