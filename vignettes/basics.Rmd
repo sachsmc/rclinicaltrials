@@ -33,8 +33,52 @@ str(z)
 This gives you basic information about the trials. For detailed information, including results, use `clinicaltrials_download()`:
 
 ```{r}
-y <- clinicaltrials_download(query = 'myeloma', count = 10)
+y <- clinicaltrials_download(query = 'myeloma', count = 10, include_results = TRUE)
 str(y)
 ```
 
 This returns a list of dataframes that have a common key variable: `nct_id`. Optionally, you can get the long text fields and/or study results (if available). 
+
+### How to use the results
+
+The data come from a relational database with lots of text fields, so it may take some effort to get the data into a flat format for analysis. For that reason, results come back from the `clinicaltrials_download` function as a list of dataframes. Each dataframe has a common key variable: `nct_id`. To merge dataframes, use this key. Otherwise, you can analyze the dataframes separately. They are organized into study information, locations, outcomes, interventions, results, and textblocks. Results, where available, are stored in three dataframes: participant flow, baseline data, and outcome data. 
+
+Results tables are stored in long format, so there are often multiple rows per study, each corresponding to a different group or outcome. Let's look at an example, the cumulative enrollment of men and women in phase III, melanoma, interventional studies over time. 
+
+```{r}
+melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2", "type=Intr", "rslt=With"), count = 1e6)
+nrow(melanom)
+table(melanom$status.text)
+```
+
+Now to download the data:
+
+```{r}
+melanom_information <- clinicaltrials_download(frame = melanom, count = 1e6, include_results = TRUE)
+summary(melanom_information$study_results$baseline_data)
+
+gend_data <- subset(melanom_information$study_results$baseline_data, title == "Gender" & arm != "Total")
+
+library(plyr)
+
+gender_counts <- ddply(gend_data, ~ nct_id + subtitle, function(df){
+  
+  data.frame(
+    count = sum(as.numeric(paste(df$value)), na.rm = TRUE)
+    )
+  
+})
+
+dates <- melanom_information$study_information$study_info[, c("nct_id", "start_date")]
+dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.numeric(d[2]))
+
+counts <- merge(gender_counts, dates, by = "nct_id")
+```
+
+```{r fig}
+library(ggplot2)
+cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
+colnames(cts)[2] <- "Gender"
+ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
+  geom_line() + geom_point() + labs(title = "Cumulative enrollment into Phase III, interventional trials in Melanoma, by gender") + scale_y_continuous("Cumulative Enrollment")
+```

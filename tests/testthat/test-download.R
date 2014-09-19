@@ -12,6 +12,6 @@ test_that("download function returns correct format", {
   res <- clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5, include_results = TRUE)
 
   expect_equal(names(nores), c("study_info", "locations", "interventions", "outcomes", "textblocks"))
-  expect_equal(names(res), c("study_information", "results"))
+  expect_equal(names(res), c("study_information", "study_results"))
 
 })

@@ -104,39 +104,41 @@ gather_results <- function(parsed){
 
   })
 
-  results_table <- do.call(plyr::rbind.fill, XML::xmlApply(measures, function(node){
+  if(!is.null(measures)) {
+      results_table <- do.call(plyr::rbind.fill, XML::xmlApply(measures, function(node){
 
-    #outer most level: titles and units
-    lank <- XML::xmlSApply(node, function(n){
-      # category_list -> return sub-titles
-      if(XML::xmlName(n) == "category_list"){
+        #outer most level: titles and units
+        lank <- XML::xmlSApply(node, function(n){
+          # category_list -> return sub-titles
+          if(XML::xmlName(n) == "category_list"){
 
-        do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
-          data.frame(
-            cbind(
-              subtitle = XML::xmlValue(n0),
-              t(XML::xmlSApply(n0[["measurement_list"]], XML::xmlAttrs))),
-            row.names = NULL)
-        }))
+            do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
+              data.frame(
+                cbind(
+                  subtitle = XML::xmlValue(n0),
+                  t(XML::xmlSApply(n0[["measurement_list"]], XML::xmlAttrs))),
+                row.names = NULL)
+            }))
 
-        } else {
+            } else {
 
-          XML::xmlValue(n)
+              XML::xmlValue(n)
 
-        }
-    })
+            }
+        })
 
-   target <- lank$category_list
-   fillout <- lank[names(lank) != "category_list"]
-   cbind(fillout, target)
+       target <- lank$category_list
+       fillout <- lank[names(lank) != "category_list"]
+       cbind(fillout, target)
 
-  }))
+      }))
 
-  results_table$arm <- gp_look[results_table$group_id]
+      results_table$arm <- gp_look[results_table$group_id]
 
-  cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list")],
+      cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list")],
         results_table)
 
+  } else data.frame(results_titles)
 
 })
 
@@ -156,7 +158,9 @@ list(
 
 get_group_lookup <- function(parsed, xpath){
 
-  group_list <- parsed[[xpath]]
+  group_list <- tryCatch(parsed[[xpath]], error = function(e) NULL)
+  if(is.null(group_list)) return(NULL)
+
   group_lookup <- as.data.frame(t(XML::xmlSApply(group_list,
                                             function(node){
                                               c(XML::xmlAttrs(node), XML::xmlValue(XML::xmlChildren(node)$title))
