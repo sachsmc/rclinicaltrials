@@ -30,11 +30,10 @@ clinicaltrials_search <-
 
     # count by default is 20, change to a very large number if count = NULL
 
-    if(is.null(count)) count <- 1e6  # there are currently 174862 trials
+    if(is.null(count)) count <- 1e6  # there are currently 174862 trials as of 18-Sept-2014
     if(!is.integer(as.integer(count))) stop("Count must be a number")
 
     count_str <- paste0("&count=", as.integer(count))
-    # do search
     search_result <- httr::GET(paste0(query_url, query, "&displayxml=true", count_str))
 
     if(search_result$status != 200) stop(httr::http_status(search_result)$message)
