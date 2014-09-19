@@ -32,12 +32,5 @@ test_that("all results, no results, and standard search doesn't return error", {
 
   expect_equal(nrow(clinicaltrials_search("lyme disease", count = 1e6)), clinicaltrials_count("lyme disease"))
 
-  # download returns correct number of trials
-
-  expect_equal(clinicaltrials_count("lyme disease"), length(unique(clinicaltrials_download("lyme disease", count = 1e6)$study_info$nct_id)))
-
-  # download returns correct list format
-
-  expect_equal(names(clinicaltrials_download("myeloma", count = 5)), c("study_info" ,   "locations"  ,   "interventions", "outcomes"  ,    "results"   ,    "textblocks"))
 
 })
