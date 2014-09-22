@@ -22,6 +22,7 @@ Suggests:
     devtools,
     knitr,
     roxygen2,
-    testthat
+    testthat,
+    ggplot2
 VignetteBuilder: knitr
 LazyData: true

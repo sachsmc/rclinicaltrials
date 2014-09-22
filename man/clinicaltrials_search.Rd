@@ -19,12 +19,12 @@ Searches for results and returns a \code{data.frame} with basic study informatio
 }
 \examples{
 # count trials satisfying 'heart disease AND stroke AND California'
-clinicaltrials_search(query = 'heart disease AND stroke AND California')
+\dontrun{clinicaltrials_search(query = 'heart disease AND stroke AND California')}
 
 # advanced search for open, interventional trials involving melanoma
-clinicaltrials_search(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))
+\dontrun{clinicaltrials_search(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))}
 
 # limit to 10 results
-clinicaltrials_search(query = "colon cancer", count = 10)
+\dontrun{clinicaltrials_search(query = "colon cancer", count = 10)}
 }
 

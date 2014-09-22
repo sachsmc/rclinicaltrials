@@ -27,16 +27,23 @@ gather_results <- function(parsed){
 
 
   gp_look <- get_group_lookup(parsed, "//participant_flow/group_list")
-  period <- parsed[["//period_list/period/milestone_list"]]
+  period <- parsed["//period_list/period"]
 
   flow_table <- do.call(plyr::rbind.fill, XML::xmlApply(period, function(node){
 
     cbind(
-      title = XML::xmlValue(node),
-      data.frame(t(XML::xmlSApply(node[[2]], XML::xmlAttrs)), row.names = 1:length(gp_look), stringsAsFactors = FALSE)
+      title = XML::xmlValue(node[["title"]]),
+        do.call(plyr::rbind.fill, XML::xmlApply(node[["milestone_list"]], function(n0){
+
+          cbind(status = XML::xmlValue(n0[["title"]]),
+          data.frame(t(XML::xmlSApply(n0[["participants_list"]], XML::xmlAttrs)), stringsAsFactors = FALSE, row.names = 1:length(gp_look)))
+
+        }))
     )
 
-  }))
+      }))
+
+
 
   flow_table$arm <- gp_look[flow_table$group_id]
   flow_table$nct_id <- this_nct_id

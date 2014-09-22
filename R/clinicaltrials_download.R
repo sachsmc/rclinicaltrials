@@ -18,7 +18,7 @@
 #'
 #' @examples
 #' # trials satisfying 'heart disease AND stroke AND California'
-#' clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)
+#' \dontrun{clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)}
 #'
 #'
 clinicaltrials_download <-

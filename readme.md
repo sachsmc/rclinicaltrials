@@ -72,7 +72,7 @@ If you have any difficulties, or notice anything strange with the results, pleas
 To view the tutorial for the `rclinicaltrials` package:
 
 ```r
-vignette("rclinicaltrials", "rclinicaltrials")
+vignette("basics", "rclinicaltrials")
 ```
 
 

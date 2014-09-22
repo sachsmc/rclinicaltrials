@@ -12,10 +12,10 @@
 #'
 #' @examples
 #' # count trials satisfying 'heart disease AND stroke AND California'
-#' clinicaltrials_count(query = 'heart disease AND stroke AND California')
+#' \dontrun{clinicaltrials_count(query = 'heart disease AND stroke AND California')}
 #'
 #' # advanced search for open, interventional trials involving melanoma
-#' clinicaltrials_count(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))
+#' \dontrun{clinicaltrials_count(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))}
 #'
 clinicaltrials_count <-
   function(query = NULL)
