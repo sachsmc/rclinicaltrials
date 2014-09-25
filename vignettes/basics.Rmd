@@ -73,7 +73,7 @@ table(melanom$status.text)
 Now to download the data:
 
 ```{r}
-melanom_information <- clinicaltrials_download(frame = melanom, count = 1e6, include_results = TRUE)
+melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", "type=Intr", "rslt=With"), count = 1e6, include_results = TRUE)
 summary(melanom_information$study_results$baseline_data)
 
 gend_data <- subset(melanom_information$study_results$baseline_data, title == "Gender" & arm != "Total")

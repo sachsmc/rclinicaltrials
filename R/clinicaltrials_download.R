@@ -1,13 +1,11 @@
 #' Downloads detailed information about clinical trials satisfying a query
 #'
-#' Given a query or a data frame resulting from \link{clinicaltrials_search},
+#' Given a query,
 #' downloads detailed study information from clinicaltrials.gov. Optionally
 #' includes results of completed trials.
 #'
 #' @param query Search pattern as a string; a vector of key-value pairs is
 #'   interpreted as an advanced search and is therefore combined with '&'
-#' @param frame Data frame containing trial identifiers, as returned by
-#'   \link{clinicaltrials_search}
 #' @param count Limit the results to a specified integer. Set to NULL to include all results.
 #' @param include_results Logical. Include results of completed trials
 #' @param include_textblocks Logical. Include lengthy text descriptions and eligibility criteria.
@@ -22,21 +20,25 @@
 #'
 #'
 clinicaltrials_download <-
-  function(query = NULL, frame = NULL, count = 20, include_results = FALSE, include_textblocks = FALSE)
+  function(query = NULL, count = 20, include_results = FALSE, include_textblocks = FALSE)
   {
 
-    if(is.null(frame)){
+    query_url <- "http://clinicaltrials.gov/ct2/results?"
 
-      frame <- clinicaltrials_search(query, count)
+    query <- paste_query(query)
 
-    }
+    # count by default is 20, change to a very large number if count = NULL
 
-    query_url <- "http://clinicaltrials.gov/ct2/results?id="
-    final_url <- paste0(query_url, paste(frame$nct_id, collapse = "+OR+"))
+    if(is.null(count)) count <- 1e6  # there are currently 174862 trials as of 18-Sept-2014
+    if(!is.integer(as.integer(count))) stop("Count must be a number")
+
+    count_str <- paste0("&count=", as.integer(count))
 
     inc_res <- ifelse(include_results, "&resultsxml=true", "&studyxml=true")
 
-    search_result <- httr::GET(paste0(final_url, inc_res))
+    final_url <- paste0(query_url, query, inc_res, count_str)
+
+    search_result <- httr::GET(final_url)
 
     ## download and unzip to a temporary directory
 
