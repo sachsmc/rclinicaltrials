@@ -66,15 +66,16 @@ gather_results <- function(parsed){
 
           tmpRes <- XML::xmlApply(n0[["measurement_list"]], function(x){
 
-            as.data.frame(t(XML::xmlAttrs(x)))
+            as.data.frame(t(XML::xmlAttrs(x)), stringsAsFactors = FALSE)
 
           })
           ResAdd <- do.call(plyr::rbind.fill, tmpRes)
           data.frame(
             cbind(
               subtitle = XML::xmlValue(n0),
-              ResAdd),
-            row.names = NULL)
+              ResAdd,
+              stringsAsFactors = FALSE),
+            row.names = NULL, stringsAsFactors = FALSE)
         }))
 
         } else {
@@ -123,8 +124,9 @@ gather_results <- function(parsed){
               data.frame(
                 cbind(
                   subtitle = XML::xmlValue(n0),
-                  t(XML::xmlSApply(n0[["measurement_list"]], XML::xmlAttrs))),
-                row.names = NULL)
+                  t(XML::xmlSApply(n0[["measurement_list"]], XML::xmlAttrs)),
+                  stringsAsFactors = FALSE),
+                row.names = NULL, stringsAsFactors = FALSE)
             }))
 
             } else {
@@ -184,7 +186,7 @@ get_group_lookup <- function(parsed, xpath){
 xmltodf <- function(parsed_xml, xpath){
 
   as.data.frame(do.call(plyr::rbind.fill, lapply(parsed_xml[xpath],
-                                                 function(x) as.data.frame(XML::xmlToList(x), stringsAsFactors = FALSE))))
+                                                 function(x) as.data.frame(XML::xmlToList(x), stringsAsFactors = FALSE))), stringsAsFactors = FALSE)
 
 }
 

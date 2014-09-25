@@ -1,0 +1,8 @@
+# rclinicaltrials 1.1
+
+* Added overall_official field
+* return strings as strings, not factors
+
+# rclinicaltrials 1.0
+
+* First release

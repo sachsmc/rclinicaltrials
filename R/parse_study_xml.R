@@ -26,7 +26,7 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
 
   ## basic study info
 
-  infoterms <- c("brief_title", "official_title", "overall_status", "start_date", "completion_date", "lead_sponsor/agency",
+  infoterms <- c("brief_title", "official_title", "overall_status", "start_date", "completion_date", "lead_sponsor/agency", "overall_official",
                  "phase", "study_type", "study_design", "enrollment", "primary_condition", "primary_outcome", "eligibility")
 
   study_info <- ids
@@ -44,12 +44,12 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
     infoterm <- infoterms[i]
     tmpField <- tryCatch(lapply(parsed[paste0("//", infoterm)], XML::xmlToList), error = function(e) NA)
 
-    tmpField <- as.data.frame(tmpField)
+    tmpField <- as.data.frame(tmpField, stringsAsFactors = FALSE)
     if(nrow(tmpField) == 0) next
     tmpField[["textblock"]] <- NULL
     if(ncol(tmpField) > 1) colnames(tmpField) <- paste(infoterm, colnames(tmpField), sep = ".") else
         colnames(tmpField) <- infoterm
-    study_info <- cbind(study_info, tmpField)
+    study_info <- cbind(study_info, tmpField, stringsAsFactors = FALSE)
 
     if(infoterm == "completion_date") study_info["completion_date_type"] <- tryCatch(XML::xmlAttrs(parsed[[paste0("//", infoterm)]])["type"], error = function(e) NA)
 
@@ -92,7 +92,7 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
 
       tmpField <- tryCatch(plyr::ldply(parsed[paste0("//", outterm)], function(x){
 
-        as.data.frame(XML::xmlToList(x))
+        as.data.frame(XML::xmlToList(x), stringsAsFactors = FALSE)
 
       }), error = function(e) data.frame(measure = NA))
 
