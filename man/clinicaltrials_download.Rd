@@ -3,29 +3,35 @@
 \alias{clinicaltrials_download}
 \title{Downloads detailed information about clinical trials satisfying a query}
 \usage{
-clinicaltrials_download(query = NULL, frame = NULL, count = 20,
+clinicaltrials_download(query = NULL, tframe = NULL, count = 20,
   include_results = FALSE, include_textblocks = FALSE)
 }
 \arguments{
 \item{query}{Search pattern as a string; a vector of key-value pairs is
 interpreted as an advanced search and is therefore combined with '&'}
 
-\item{frame}{Data frame containing trial identifiers, as returned by
+\item{tframe}{Data frame containing trial identifiers, as returned by
 \link{clinicaltrials_search}}
 
-\item{count}{Limit the results to a specified integer. Set to NULL to include all results.}
+\item{count}{Limit the results to a specified integer. Set to NULL to include
+all results.}
 
 \item{include_results}{Logical. Include results of completed trials}
 
-\item{include_textblocks}{Logical. Include lengthy text descriptions and eligibility criteria.}
+\item{include_textblocks}{Logical. Include lengthy text descriptions and
+  eligibility criteria.}
 }
 \value{
 A list of \code{data.frame}s.
 }
 \description{
-Given a query or a data frame resulting from \link{clinicaltrials_search},
-downloads detailed study information from clinicaltrials.gov. Optionally
-includes results of completed trials.
+Given a query, or a dataframe containing trial identifiers, downloads
+detailed study information from clinicaltrials.gov. Optionally includes
+results of completed trials. The URL search is limited to 2000 characters,
+and count restricted searches are done by NCT ID, which are 11 characters
+long. Therefore, the effective maximum count allowed is roughly 100. If count
+is greater than 100, then the first 100 trials will be returned, with a
+warning. To return all results, use a query string and set count to NULL.
 }
 \examples{
 # trials satisfying 'heart disease AND stroke AND California'

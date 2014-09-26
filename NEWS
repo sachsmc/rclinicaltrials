@@ -1,3 +1,8 @@
+# rclinicaltrials 1.2
+
+* fixed bug where download with query returned all results
+* clarified issue with download when count > 100
+
 # rclinicaltrials 1.1
 
 * Added overall_official field
