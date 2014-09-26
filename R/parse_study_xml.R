@@ -13,7 +13,7 @@
 #' @keywords Internal
 #'
 #' @return A list of \code{data.frame}s, study information, locations,
-#'   interventions, outcomes, results, and textblocks. Results and textblock
+#'   interventions, arms, outcomes, results, and textblocks. Results and textblock
 #'   frames will be \code{NULL} if not requested.
 #'
 
@@ -81,6 +81,13 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
     locations$nct_id <- ids$nct_id
   }
 
+  ## arms
+
+  arms <- xmltodf(parsed, "//arm_group")
+  if(nrow(arms) > 0){
+    arms$nct_id <- ids$nct_id
+  }
+
   ## outcomes
 
   outcometerms <- c("primary_outcome", "secondary_outcome", "other_outcome")
@@ -109,6 +116,7 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
 
   list(study_info = study_info,
        locations = locations,
+       arms = arms,
        interventions = interventions,
        outcomes = outcomes,
        textblocks = textblocks)
