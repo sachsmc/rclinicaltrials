@@ -15,7 +15,7 @@ test_that("download function returns correct format", {
 
   expect_warning(clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 105))
 
-  expect_equal(names(nores), c("study_info", "locations", "interventions", "outcomes", "textblocks"))
+  expect_equal(names(nores), c("study_info", "locations", "arms", "interventions", "outcomes", "textblocks"))
   expect_equal(names(res), c("study_information", "study_results"))
 
   expect_error(clinicaltrials_download(query = NULL, tframe = NULL))

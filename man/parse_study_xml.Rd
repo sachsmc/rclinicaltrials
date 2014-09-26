@@ -16,7 +16,7 @@ results}
 }
 \value{
 A list of \code{data.frame}s, study information, locations,
-  interventions, outcomes, results, and textblocks. Results and textblock
+  interventions, arms, outcomes, results, and textblocks. Results and textblock
   frames will be \code{NULL} if not requested.
 }
 \description{
