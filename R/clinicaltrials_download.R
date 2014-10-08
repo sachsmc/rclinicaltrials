@@ -40,8 +40,8 @@ clinicaltrials_download <-
 
         query_url <- "http://clinicaltrials.gov/ct2/results?"
         query <- paste_query(query)
+        final_url <- paste0(query_url, query, inc_res)
 
-        search_result <- httr::GET(paste0(query_url, query, inc_res))
 
       } else {
 
@@ -61,7 +61,7 @@ clinicaltrials_download <-
 
         query_url <- "http://clinicaltrials.gov/ct2/results?id="
         final_url <- paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"), inc_res)
-        search_result <- httr::GET(final_url)
+
 
       } } else if(!is.null(tframe)) {
 
@@ -80,7 +80,7 @@ clinicaltrials_download <-
 
               query_url <- "http://clinicaltrials.gov/ct2/results?id="
               final_url <- paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"), inc_res)
-              search_result <- httr::GET(final_url)
+
 
       } else stop("No search performed")
 
@@ -89,7 +89,12 @@ clinicaltrials_download <-
 
     tmpzip <- tempfile(fileext = ".zip")
     tmpdir <- gsub(".zip", "/", tmpzip, fixed = TRUE)
-    writeBin(httr::content(search_result, as = "raw"), tmpzip)
+    dir.create(tmpdir)
+
+    result <- httr::GET(final_url, httr::write_disk(tmpzip))
+
+    #writeBin(httr::content(search_result, as = "raw"), tmpzip)
+
     unzip(tmpzip, exdir = tmpdir)
 
     # get files list
