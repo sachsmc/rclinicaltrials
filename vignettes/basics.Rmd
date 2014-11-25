@@ -1,7 +1,14 @@
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Basic usage and results}
--->
+---
+title: "Downloading and using data from clinicaltrials.gov"
+author: "Michael C Sachs"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
 
 ## R interface to clinicaltrials.gov
 
@@ -65,7 +72,9 @@ The data come from a relational database with lots of text fields, so it may tak
 Results tables are stored in long format, so there are often multiple rows per study, each corresponding to a different group or outcome. Let's look at an example, the cumulative enrollment of men and women in phase III, melanoma, interventional studies over time. 
 
 ```{r}
-melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2", "type=Intr", "rslt=With"), count = 1e6)
+melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2", 
+                                           "type=Intr", "rslt=With"), 
+                                 count = 1e6)
 nrow(melanom)
 table(melanom$status.text)
 ```
@@ -73,10 +82,13 @@ table(melanom$status.text)
 Now to download the data:
 
 ```{r}
-melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", "type=Intr", "rslt=With"), count = 1e6, include_results = TRUE)
+melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
+                                                         "type=Intr", "rslt=With"), 
+                                               count = 1e6, include_results = TRUE)
 summary(melanom_information$study_results$baseline_data)
 
-gend_data <- subset(melanom_information$study_results$baseline_data, title == "Gender" & arm != "Total")
+gend_data <- subset(melanom_information$study_results$baseline_data, 
+                    title == "Gender" & arm != "Total")
 
 library(plyr)
 
@@ -99,5 +111,8 @@ library(ggplot2)
 cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
 colnames(cts)[2] <- "Gender"
 ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
-  geom_line() + geom_point() + labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + scale_y_continuous("Cumulative Enrollment")
+  geom_line() + geom_point() + 
+  labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
+  scale_y_continuous("Cumulative Enrollment") + 
+  scale_x_continuous(breaks = 2000:2012)
 ```

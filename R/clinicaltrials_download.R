@@ -87,9 +87,15 @@ clinicaltrials_download <-
 
     ## download and unzip to a temporary directory
 
-    tmpzip <- tempfile(fileext = ".zip")
-    tmpdir <- gsub(".zip", "/", tmpzip, fixed = TRUE)
-    dir.create(tmpdir)
+    tmpdir <- tempdir()
+    tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
+
+    if(file.exists(tmpdir)){
+      create <- TRUE
+    } else {
+      create <- dir.create(tmpdir)
+    }
+    stopifnot(create)
 
     result <- httr::GET(final_url, httr::write_disk(tmpzip))
 
@@ -99,8 +105,7 @@ clinicaltrials_download <-
 
     # get files list
 
-    xml_list <- paste0(tmpdir, list.files(path = tmpdir))
-
+    xml_list <- paste(tmpdir, list.files(path = tmpdir, pattern = "xml$"), sep = "/")
     info_list <- lapply(xml_list, parse_study_xml, include_textblocks)
 
     if(include_results) {

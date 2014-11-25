@@ -5,11 +5,19 @@ test_that("download function returns correct format", {
 
   # creating temp directory works
 
-  tmpzip <- tempfile(fileext = ".zip")
-  tmpdir <- gsub(".zip", "/", tmpzip, fixed = TRUE)
-  dir.create(tmpdir)
+  tmpdir <- tempdir()
+  tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
 
+  if(file.exists(tmpdir)){
+  create <- TRUE
+  } else {
+  create <- dir.create(tmpdir)
+  }
+
+  expect_true(create)
   expect_true(file.exists(tmpdir))
+
+  #unlink(tmpdir)
 
    # download returns correct number of trials
 
@@ -21,7 +29,7 @@ test_that("download function returns correct format", {
 
   expect_equal(length(unique(nores$study_info$nct_id)), 5)
 
-  expect_warning(clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 105))
+  #expect_warning(clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 105))
 
   expect_equal(names(nores), c("study_info", "locations", "arms", "interventions", "outcomes", "textblocks"))
   expect_equal(names(res), c("study_information", "study_results"))

@@ -1,21 +1,27 @@
-# rclinicaltrials 1.4
+rclinicaltrials 1.4
+--------------
 
 * save memory by using httr::write_disk in clinicaltrials_download
+* fixed windows problem!
 
-# rclinicaltrials 1.3
+rclinicaltrials 1.3
+---------------
 
 * added treatment arms table
 
-# rclinicaltrials 1.2
+rclinicaltrials 1.2
+---------------
 
 * fixed bug where download with query returned all results
 * clarified issue with download when count > 100
 
-# rclinicaltrials 1.1
+rclinicaltrials 1.1
+-------------------
 
 * Added overall_official field
 * return strings as strings, not factors
 
-# rclinicaltrials 1.0
+rclinicaltrials 1.0
+------------------
 
 * First release

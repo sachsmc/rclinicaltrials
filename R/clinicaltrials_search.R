@@ -45,7 +45,7 @@ clinicaltrials_search <-
     if(result_list$.attrs == "0") stop("Search returned 0 results")
     #convert to data.frame
 
-    result_frame <- do.call("rbind", lapply(1:length(result_list), function(i) frame_studylist(result_list[i])))
+    result_frame <- do.call(plyr::rbind.fill, lapply(1:length(result_list), function(i) frame_studylist(result_list[i])))
     result_frame$order <- NULL
     result_frame$status..attrs <- NULL
     rownames(result_frame) <- result_frame$nct_id
