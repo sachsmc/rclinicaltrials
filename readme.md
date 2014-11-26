@@ -11,8 +11,7 @@ The [rclinicaltrials](http://github.com/sachsmc/rclinicaltrials) package is in e
 
 ### Installation
 
-The package is not currently available on
-[CRAN](http://cran.r-project.org). To install, use
+To install from github, use
 `devtools::install_github()`, as follows:
 
 ```{r, eval = FALSE}

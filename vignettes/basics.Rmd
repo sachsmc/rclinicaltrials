@@ -5,9 +5,9 @@ date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{examples}
+  %\VignetteIndexEntry{basics}
   %\VignetteEngine{knitr::rmarkdown}
-  %\usepackage[utf8]{inputenc}
+  \usepackage[utf8]{inputenc}
 ---
 
 ## R interface to clinicaltrials.gov
@@ -16,8 +16,7 @@ vignette: >
 
 ### Installation
 
-The package is not currently available on
-[CRAN](http://cran.r-project.org). To install, use
+To install the latest version from github, use
 `devtools::install_github()`, as follows:
 
 ```{r, eval = FALSE}
@@ -106,13 +105,17 @@ dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.nume
 counts <- merge(gender_counts, dates, by = "nct_id")
 ```
 
-```{r fig, fig.width = 6, fig.height = 5}
+```{r fig}
 library(ggplot2)
 cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
 colnames(cts)[2] <- "Gender"
-ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
+p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
   geom_line() + geom_point() + 
   labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
   scale_y_continuous("Cumulative Enrollment") + 
   scale_x_continuous(breaks = 2000:2012)
+```
+
+```{r plo, fig.width = 6, fig.height = 5}
+#p
 ```
