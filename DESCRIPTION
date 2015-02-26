@@ -1,6 +1,6 @@
 Package: rclinicaltrials
 Type: Package
-Title: An Interface to the ClinicalTrials.gov Application Programming Interface
+Title: Download Aggregate Trial Information and Results from ClinicalTrials.gov
 Description: ClinicalTrials.gov is a registry and results database of publicly
     and privately supported clinical studies of human participants conducted
     around the world. Users can search for information about and results from
