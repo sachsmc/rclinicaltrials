@@ -21,7 +21,7 @@ test_that("download function returns correct format", {
 
    # download returns correct number of trials
 
-  expect_equal(clinicaltrials_count("lyme disease"), length(unique(clinicaltrials_download(query = "lyme disease", count = 1e6)$study_info$nct_id)))
+  expect_equal(clinicaltrials_count("lyme disease"), length(unique(clinicaltrials_download(query = "lyme disease", count = NULL)$study_info$nct_id)))
 
 
   nores <- clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)
