@@ -31,42 +31,51 @@ clinicaltrials_download <-
   function(query = NULL, tframe = NULL, count = 20, include_results = FALSE, include_textblocks = FALSE)
   {
 
+    if(is.null(query) || query == ""){
+
+      stop("No query parameters given")
+
+    }
+    aquery <- query
+    query <- paste_query(query)
+
     if(!is.integer(as.integer(count))) stop("Count must be a number")
     inc_res <- ifelse(include_results, "&resultsxml=true", "&studyxml=true")
 
     if(!is.null(query)){
 
+      tcount <- clinicaltrials_count(aquery)
+
       if(is.null(count)) {  # return all results
 
         query_url <- "http://clinicaltrials.gov/ct2/results?"
-        query <- paste_query(query)
         final_url <- paste0(query_url, query, inc_res)
-
+        count <- tcount
 
       } else {
 
-        tframe <- clinicaltrials_search(query, count)
+
         ## if count is too big, but less than the nrow(tframe) return first 100 results with a warning
 
-        if(nrow(tframe) > 100 & count > 100){
+        if(tcount > 100 & count > 100){
 
-          dex <- 1:100
+          count_str <- paste0("&count=", 100)
           warning("Count is too large (>100), only returning top 100 results. Use query and count = NULL to return all results")
 
         } else {
 
-          dex <- 1:min(count, nrow(tframe))
+          count_str <- paste0("&count=", as.integer(count))
 
         }
 
-        query_url <- "http://clinicaltrials.gov/ct2/results?id="
-        final_url <- paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"), inc_res)
+        query_url <- "http://clinicaltrials.gov/ct2/results?"
+        final_url <- paste0(query_url, query, count_str, inc_res)
 
 
       } } else if(!is.null(tframe)) {
 
               ## if count is too big, but less than the nrow(tframe) return first 100 results with a warning
-
+              tcount <- nrow(tframe)
               if(count > 100 & count > nrow(tframe)){
 
                 dex <- 1:100
@@ -105,7 +114,7 @@ clinicaltrials_download <-
 
     # get files list
 
-    xml_list <- paste(tmpdir, list.files(path = tmpdir, pattern = "xml$"), sep = "/")
+    xml_list <- paste(tmpdir, list.files(path = tmpdir, pattern = "xml$")[1:min(tcount, count)], sep = "/")
     info_list <- lapply(xml_list, parse_study_xml, include_textblocks)
 
     if(include_results) {
