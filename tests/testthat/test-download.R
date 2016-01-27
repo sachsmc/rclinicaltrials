@@ -36,4 +36,8 @@ test_that("download function returns correct format", {
 
   expect_error(clinicaltrials_download(query = NULL, tframe = NULL))
 
+  testcase <- clinicaltrials_download("NCT01419197", include_results = TRUE)
+  #test$study_results$outcome_data$analysis_list
+
+
 })
