@@ -1,3 +1,7 @@
+rclinicaltrials 1.4.2
+---------------
+* Now handles analysis_list if it is present in results
+
 rclinicaltrials 1.4.1
 ---------------
 
