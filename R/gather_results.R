@@ -16,10 +16,10 @@ gather_results <- function(parsed){
     return(NULL)
   })
   if(is.null(check)) return(list(
-          participant_flow = NULL,
-          baseline_data = NULL,
-          outcome_data = NULL
-     ))
+    participant_flow = NULL,
+    baseline_data = NULL,
+    outcome_data = NULL
+  ))
 
   this_nct_id <- XML::xmlValue(parsed[["//nct_id"]])
 
@@ -33,15 +33,15 @@ gather_results <- function(parsed){
 
     cbind(
       title = XML::xmlValue(node[["title"]]),
-        do.call(plyr::rbind.fill, XML::xmlApply(node[["milestone_list"]], function(n0){
+      do.call(plyr::rbind.fill, XML::xmlApply(node[["milestone_list"]], function(n0){
 
-          cbind(status = XML::xmlValue(n0[["title"]]),
-          data.frame(t(XML::xmlSApply(n0[["participants_list"]], XML::xmlAttrs)), stringsAsFactors = FALSE, row.names = 1:length(gp_look)))
-
-        }))
-    )
+        cbind(status = XML::xmlValue(n0[["title"]]),
+              data.frame(t(XML::xmlSApply(n0[["participants_list"]], XML::xmlAttrs)), stringsAsFactors = FALSE, row.names = 1:length(gp_look)))
 
       }))
+    )
+
+  }))
 
 
 
@@ -78,16 +78,16 @@ gather_results <- function(parsed){
             row.names = NULL, stringsAsFactors = FALSE)
         }))
 
-        } else {
+      } else {
 
-          XML::xmlValue(n)
+        XML::xmlValue(n)
 
-        }
+      }
     })
 
-   target <- lank$category_list
-   fillout <- lank[names(lank) != "category_list"]
-   cbind(fillout, target)
+    target <- lank$category_list
+    fillout <- lank[names(lank) != "category_list"]
+    cbind(fillout, target)
 
   }))
 
@@ -96,23 +96,26 @@ gather_results <- function(parsed){
 
   ## outcomes
 
+  #parsed_out <- xml2::xml_find_all(x, ".//outcome")
+
   all_results_list <- XML::xmlApply(parsed[["//clinical_results/outcome_list"]], function(parsed_out){
 
-  gp_look <- get_group_lookup(parsed_out, "group_list")
+    gp_look <- get_group_lookup(parsed_out, "group_list")
 
-  measures <- parsed_out[["measure_list"]]
+    measures <- parsed_out[["measure_list"]]
+    analysis <- parsed_out[["analysis_list"]]
 
-  results_titles <- XML::xmlApply(parsed_out, function(node){
+    results_titles <- XML::xmlApply(parsed_out, function(node){
 
-    if(XML::xmlName(node) %in% c("group_list", "measure_list")) return(NULL) else {
+      if(XML::xmlName(node) %in% c("group_list", "measure_list", "analysis_list")) return(NULL) else {
 
-      XML::xmlValue(node)
+        XML::xmlValue(node)
 
-    }
+      }
 
-  })
+    })
 
-  if(!is.null(measures)) {
+    if(!is.null(measures)) {
       results_table <- do.call(plyr::rbind.fill, XML::xmlApply(measures, function(node){
 
         #outer most level: titles and units
@@ -129,36 +132,74 @@ gather_results <- function(parsed){
                 row.names = NULL, stringsAsFactors = FALSE)
             }))
 
-            } else {
+          } else {
 
-              XML::xmlValue(n)
+            XML::xmlValue(n)
 
-            }
+          }
         })
 
-       target <- lank$category_list
-       fillout <- lank[names(lank) != "category_list"]
-       cbind(fillout, target)
+        target <- lank$category_list
+        fillout <- lank[names(lank) != "category_list"]
+        cbind(fillout, target)
 
       }))
 
       results_table$arm <- gp_look[results_table$group_id]
 
-      cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list")],
-        results_table)
+      measures_table <- cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")],
+            results_table)
 
-  } else data.frame(results_titles)
+    } else measures_table <- data.frame(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")])
 
-})
+    if(!is.null(analysis)){
 
-final_outcome_table <- do.call(plyr::rbind.fill, all_results_list)
-final_outcome_table$nct_id <- this_nct_id
+      analysis_table <- do.call(plyr::rbind.fill, XML::xmlApply(analysis, function(node){
 
-list(
-  participant_flow = flow_table,
-  baseline_data = baseline_table,
-  outcome_data = final_outcome_table
-     )
+        lank <- as.data.frame(XML::xmlApply(node, function(n){
+
+          if(XML::xmlName(n) == "group_id_list"){
+
+            data.frame(group_id = XML::xmlSApply(n, XML::xmlValue), stringsAsFactors = FALSE)
+
+          } else {
+
+            tmp <- data.frame(XML::xmlValue(n), stringsAsFactors = FALSE)
+            colnames(tmp) <- XML::xmlName(n)
+            tmp
+
+          }
+        }), stringsAsFactors = FALSE)
+
+      }))
+
+      analysis_table$arm <- gp_look[analysis_table$group_id]
+
+      analysis_table <- cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")],
+            analysis_table)
+
+    } else analysis_table <- data.frame(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")])
+
+
+    if(is.null(analysis)){
+      measures_table
+    } else if(is.null(measures)){
+      analysis_table
+    } else {
+      plyr::rbind.fill(measures_table, analysis_table)
+    }
+
+
+  })
+
+  final_outcome_table <- do.call(plyr::rbind.fill, all_results_list)
+  final_outcome_table$nct_id <- this_nct_id
+
+  list(
+    participant_flow = flow_table,
+    baseline_data = baseline_table,
+    outcome_data = final_outcome_table
+  )
 
 }
 
@@ -171,9 +212,9 @@ get_group_lookup <- function(parsed, xpath){
   if(is.null(group_list)) return(NULL)
 
   group_lookup <- as.data.frame(t(XML::xmlSApply(group_list,
-                                            function(node){
-                                              c(XML::xmlAttrs(node), XML::xmlValue(XML::xmlChildren(node)$title))
-                                              })), stringsAsFactors = FALSE)
+                                                 function(node){
+                                                   c(XML::xmlAttrs(node), XML::xmlValue(XML::xmlChildren(node)$title))
+                                                 })), stringsAsFactors = FALSE)
 
   group_look <- group_lookup[,2]
   names(group_look) <- group_lookup$group_id
