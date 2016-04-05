@@ -7,8 +7,8 @@ Description: ClinicalTrials.gov is a registry and results database of publicly
     those trials. This provides a set of functions to interact with the search
     and download features. Results are downloaded to temporary directories and
     returned as R objects.
-Version: 1.4.2
-Date: 2016-01-27
+Version: 1.4.3
+Date: 2016-04-04
 Author: Michael C Sachs <sachsmc@gmail.com>
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Depends:

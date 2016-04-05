@@ -76,9 +76,10 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
   } else textblocks <- NULL
   ## locations
 
-  locations <- xmltodf(parsed, "//facility")
+  locations <- xmltodf(parsed, "//location")
   if(nrow(locations) > 0){
     locations$nct_id <- ids$nct_id
+    colnames(locations) <- gsub("facility.", "", colnames(locations), fixed = TRUE)
   }
 
   ## arms

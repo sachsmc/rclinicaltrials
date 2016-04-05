@@ -227,7 +227,9 @@ get_group_lookup <- function(parsed, xpath){
 xmltodf <- function(parsed_xml, xpath){
 
   as.data.frame(do.call(plyr::rbind.fill, lapply(parsed_xml[xpath],
-                                                 function(x) as.data.frame(XML::xmlToList(x), stringsAsFactors = FALSE))), stringsAsFactors = FALSE)
+                                                 function(x) as.data.frame(XML::xmlToList(x),
+                                                                           stringsAsFactors = FALSE))),
+                stringsAsFactors = FALSE)
 
 }
 
