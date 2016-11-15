@@ -1,3 +1,7 @@
+rclinicaltrials 1.4.4
+----------------
+* Allow multiple primary conditions
+
 rclinicaltrials 1.4.3
 ----------------
 * returns status from locations/facilities

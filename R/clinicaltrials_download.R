@@ -110,7 +110,7 @@ clinicaltrials_download <-
 
     #writeBin(httr::content(search_result, as = "raw"), tmpzip)
 
-    unzip(tmpzip, exdir = tmpdir)
+    utils::unzip(tmpzip, exdir = tmpdir)
 
     # get files list
 
