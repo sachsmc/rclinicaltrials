@@ -39,5 +39,11 @@ test_that("download function returns correct format", {
   testcase <- clinicaltrials_download("NCT01419197", include_results = TRUE)
   #test$study_results$outcome_data$analysis_list
 
+  # download returns for tframe parameter
+  tframe.count <- clinicaltrials_count(query = 'heart disease AND stroke AND California') # 304L
+  tframe <- clinicaltrials_search(query = 'heart disease AND stroke AND California', count = NULL) # n = 304
+  completed.tframe <- tframe[tframe$status.text %in% c("Withdrawn", "Completed", "Terminated"),] # n = 155
+  completed.download.tframe.subset <- clinicaltrials_download(tframe = completed.tframe, count = 25, include_results = TRUE) # study_info :'data.frame': 25 obs. of 77 variables
+  #completed.download.tframe.full <- clinicaltrials_download(tframe = completed.tframe, count = NULL, include_results = TRUE) # study_info :'data.frame': 155 obs. of 143 variables
 
 })
