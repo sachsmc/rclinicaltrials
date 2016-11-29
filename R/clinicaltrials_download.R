@@ -49,7 +49,7 @@ clinicaltrials_download <-
       if(is.null(count)) {  # return all results
 
         query_url <- "http://clinicaltrials.gov/ct2/results?"
-        final_url <- paste0(query_url, query, inc_res)
+        final_urls <- c(paste0(query_url, query, inc_res))
         count <- tcount
 
       } else {
@@ -69,8 +69,7 @@ clinicaltrials_download <-
         }
 
         query_url <- "http://clinicaltrials.gov/ct2/results?"
-        final_url <- paste0(query_url, query, count_str, inc_res)
-
+        final_urls <- c(paste0(query_url, query, count_str, inc_res))
 
       }
     } else if(!is.null(tframe)) {
@@ -83,28 +82,27 @@ clinicaltrials_download <-
         count <- tcount
       }
 
-      if(count > 100 & count > tcount){
+      if(count > 100){
 
-        dex <- 1:100
-        warning("Count is too large (>100), only returning top 100 results. Use query and count = NULL to return all results")
-
-      } else {
-
-        dex <- 1:count
+        warning("Count of nct_ids is large (>100), so this download and extraction could take a while.")
 
       }
 
-      query_url <- "http://clinicaltrials.gov/ct2/results?id="
-      final_url <- paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"), inc_res)
+      final_urls <- character() # define empty vector
+      for (i in seq(from=1, to=tcount, by=100)) # loop to add urls to final_urls vector
+      {
+        end <- ifelse(i + 99 > tcount, tcount, i + 99) # gives endpoint of current loop iteration
+        dex <- i:end
+        query_url <- "http://clinicaltrials.gov/ct2/results?id="
+        final_urls <- c(final_urls, paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"), inc_res)) # append to vector
+      }
 
     } else stop("No search performed")
 
 
-    ## download and unzip to a temporary directory
+    ## create temporary directory for download and extraction
 
     tmpdir <- tempdir()
-    tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
-
     if(file.exists(tmpdir)){
       create <- TRUE
     } else {
@@ -112,11 +110,20 @@ clinicaltrials_download <-
     }
     stopifnot(create)
 
-    result <- httr::GET(final_url, httr::write_disk(tmpzip))
+    ## loop through URLs, download and extract into temporary directory
 
-    #writeBin(httr::content(search_result, as = "raw"), tmpzip)
+    for (final_url in final_urls) {
 
-    utils::unzip(tmpzip, exdir = tmpdir)
+      tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
+
+      result <- httr::GET(final_url, httr::write_disk(tmpzip))
+
+      #writeBin(httr::content(search_result, as = "raw"), tmpzip)
+
+      utils::unzip(tmpzip, exdir = tmpdir)
+
+      Sys.sleep(0.1) # sleep 0.1 sec as requested by Crawl-delay parameter in http://www.clinicaltrials.gov/robots.txt
+    }
 
     # get files list
 
