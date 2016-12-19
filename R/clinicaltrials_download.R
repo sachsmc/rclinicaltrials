@@ -19,7 +19,7 @@
 #'   eligibility criteria.
 #'
 #' @export
-#'
+#' @importFrom utils unzip
 #' @return A list of \code{data.frame}s.
 #'
 #' @examples
