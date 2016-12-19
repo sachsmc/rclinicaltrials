@@ -78,6 +78,24 @@ gather_results <- function(parsed){
             row.names = NULL, stringsAsFactors = FALSE)
         }))
 
+      } else if(XML::xmlName(n) == "class_list"){
+
+        do.call(plyr::rbind.fill, XML::xmlApply(n[[1]][["category_list"]], function(n0){
+
+          tmpRes <- XML::xmlApply(n0[["measurement_list"]], function(x){
+
+            as.data.frame(t(XML::xmlAttrs(x)), stringsAsFactors = FALSE)
+
+          })
+          ResAdd <- do.call(plyr::rbind.fill, tmpRes)
+          data.frame(
+            cbind(
+              subtitle = XML::xmlValue(n[[1]][["title"]]),
+              ResAdd,
+              stringsAsFactors = FALSE),
+            row.names = NULL, stringsAsFactors = FALSE)
+        }))
+
       } else {
 
         XML::xmlValue(n)
@@ -85,6 +103,7 @@ gather_results <- function(parsed){
       }
     })
 
+    names(lank)[names(lank) == "class_list"] <- "category_list"
     target <- lank$category_list
     fillout <- lank[names(lank) != "category_list"]
     cbind(fillout, target)
