@@ -80,9 +80,10 @@ gather_results <- function(parsed){
 
       } else if(XML::xmlName(n) == "class_list"){
 
-        do.call(plyr::rbind.fill, XML::xmlApply(n[[1]][["category_list"]], function(n0){
+        do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
 
-          tmpRes <- XML::xmlApply(n0[["measurement_list"]], function(x){
+          subtitle <- XML::xmlValue(n0[["title"]])
+          tmpRes <- XML::xmlApply(n0[["category_list"]][["category"]][["measurement_list"]], function(x){
 
             as.data.frame(t(XML::xmlAttrs(x)), stringsAsFactors = FALSE)
 
@@ -90,7 +91,7 @@ gather_results <- function(parsed){
           ResAdd <- do.call(plyr::rbind.fill, tmpRes)
           data.frame(
             cbind(
-              subtitle = XML::xmlValue(n[[1]][["title"]]),
+              subtitle = subtitle,
               ResAdd,
               stringsAsFactors = FALSE),
             row.names = NULL, stringsAsFactors = FALSE)

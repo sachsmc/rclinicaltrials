@@ -7,7 +7,7 @@ output:
 vignette: >
   %\VignetteIndexEntry{basics}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ## R interface to clinicaltrials.gov
@@ -16,7 +16,7 @@ vignette: >
 
 ### Installation
 
-To install the latest version from github, use
+The package is available on CRAN and can be installed as usual. To install the latest version from github, use
 `devtools::install_github()`, as follows:
 
 ```{r, eval = FALSE}
@@ -117,5 +117,5 @@ p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) +
 ```
 
 ```{r plo, fig.width = 6, fig.height = 5}
-#p
+p
 ```

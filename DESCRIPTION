@@ -19,6 +19,7 @@ Imports:
     XML,
     plyr
 Suggests:
+    rmarkdown,
     devtools,
     knitr,
     roxygen2,

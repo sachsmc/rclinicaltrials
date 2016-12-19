@@ -6,7 +6,7 @@
 
 Note that the clinicaltrials.gov API _does not_ require an API key.
 
-The [rclinicaltrials](http://github.com/sachsmc/rclinicaltrials) package is in early development.
+The [rclinicaltrials](http://github.com/sachsmc/rclinicaltrials) package is ongoing development.
 
 
 ### Installation

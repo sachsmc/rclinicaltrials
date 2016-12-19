@@ -1,4 +1,4 @@
-## ----, eval = FALSE------------------------------------------------------
+## ---- eval = FALSE-------------------------------------------------------
 #  install.packages("devtools")
 #  library(devtools)
 #  install_github("sachsmc/rclinicaltrials")
@@ -23,15 +23,20 @@ y <- clinicaltrials_download(query = 'myeloma', count = 10, include_results = TR
 str(y)
 
 ## ------------------------------------------------------------------------
-melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2", "type=Intr", "rslt=With"), count = 1e6)
+melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2", 
+                                           "type=Intr", "rslt=With"), 
+                                 count = 1e6)
 nrow(melanom)
 table(melanom$status.text)
 
 ## ------------------------------------------------------------------------
-melanom_information <- clinicaltrials_download(frame = melanom, count = 1e6, include_results = TRUE)
+melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
+                                                         "type=Intr", "rslt=With"), 
+                                               count = 1e6, include_results = TRUE)
 summary(melanom_information$study_results$baseline_data)
 
-gend_data <- subset(melanom_information$study_results$baseline_data, title == "Gender" & arm != "Total")
+gend_data <- subset(melanom_information$study_results$baseline_data, 
+                    title == "Gender" & arm != "Total")
 
 library(plyr)
 
@@ -48,10 +53,16 @@ dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.nume
 
 counts <- merge(gender_counts, dates, by = "nct_id")
 
-## ----fig, fig.width = 6, fig.height = 5----------------------------------
+## ----fig-----------------------------------------------------------------
 library(ggplot2)
 cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
 colnames(cts)[2] <- "Gender"
-ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
-  geom_line() + geom_point() + labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + scale_y_continuous("Cumulative Enrollment")
+p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
+  geom_line() + geom_point() + 
+  labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
+  scale_y_continuous("Cumulative Enrollment") + 
+  scale_x_continuous(breaks = 2000:2012)
+
+## ----plo, fig.width = 6, fig.height = 5----------------------------------
+p
 
