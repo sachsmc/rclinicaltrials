@@ -32,7 +32,13 @@ melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2",
 nrow(melanom)
 table(melanom$status.text)
 
-## ------------------------------------------------------------------------
+melanom2 <- clinicaltrials_search(query = list(cond = "melanoma", phase = "2", 
+                                           type = "Intr", rslt = "With"), 
+                                 count = 1e6)
+nrow(melanom)
+
+
+## ----fig, fig.width = 6.5, fig.height = 5--------------------------------
 melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
                                                          "type=Intr", "rslt=With"), 
                                                count = 1e6, include_results = TRUE)
@@ -54,7 +60,6 @@ dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.nume
 
 counts <- merge(gender_counts, dates, by = "nct_id")
 
-## ----fig-----------------------------------------------------------------
 cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
 colnames(cts)[2] <- "Gender"
 p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
@@ -62,7 +67,5 @@ p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) +
   labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
   scale_y_continuous("Cumulative Enrollment") + 
   scale_x_continuous(breaks = 2000:2012)
-
-## ----plo, fig.width = 6, fig.height = 5----------------------------------
 p
 

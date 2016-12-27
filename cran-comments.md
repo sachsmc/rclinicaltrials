@@ -1,4 +1,8 @@
-This is a resubmission. Modified the description to read: ClinicalTrials.gov is a registry and results database of publicly
+This is a resubmission. 
+
+Modified the description to read: 
+
+ClinicalTrials.gov is a registry and results database of publicly
     and privately supported clinical studies of human participants conducted
     around the world (see <https://clinicaltrials.gov/> for more information). 
     Users can search for information about and results from
@@ -6,7 +10,7 @@ This is a resubmission. Modified the description to read: ClinicalTrials.gov is 
     and download features. Results are downloaded to temporary directories and
     returned as R objects.
     
-Kurt reported the following error. The package downloads data to temporary directories and this is the error I would expect if the expected directory didn't exist. I'm not sure what is causing it and I can't seem to reproduce the error. 
+Kurt reported the following error. I was able to reproduce the error using travis CI. I changed a couple things in the vignette that fixes it.
 
 * checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
