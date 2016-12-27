@@ -26,15 +26,15 @@ clinicaltrials_search <-
   {
     query_url <- "http://clinicaltrials.gov/ct2/results?"
 
-    query <- paste_query(query)
+    final_query <- paste_query2(query)
 
     # count by default is 20, change to a very large number if count = NULL
 
     if(is.null(count)) count <- 1e6  # there are currently 174862 trials as of 18-Sept-2014
     if(!is.integer(as.integer(count))) stop("Count must be a number")
 
-    count_str <- paste0("&count=", as.integer(count))
-    search_result <- httr::GET(paste0(query_url, query, "&displayxml=true", count_str))
+    #count_str <- paste0("&count=", as.integer(count))
+    search_result <- httr::GET(query_url, query = c(final_query, displayxml="true", count=as.integer(count)))
 
     if(search_result$status != 200) stop(httr::http_status(search_result)$message)
 

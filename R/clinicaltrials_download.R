@@ -26,13 +26,18 @@
 #' # trials satisfying 'heart disease AND stroke AND California'
 #' \dontrun{clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)}
 #'
+#' # advanced search for open, interventional trials involving melanoma
+#' \dontrun{clinicaltrials_download(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))}
+#'
+#' # can also use a named list
+#' \dontrun{clinicaltrials_download(query = list(recr='Open', type='Intr', cond='melanoma'))}
 #'
 clinicaltrials_download <-
   function(query = NULL, tframe = NULL, count = 20, include_results = FALSE, include_textblocks = FALSE)
   {
 
     if(!is.integer(as.integer(count))) stop("Count must be a number or NULL")
-    inc_res <- ifelse(include_results, "&resultsxml=true", "&studyxml=true")
+    if(include_results) inc_res <- list(resultsxml="true") else inc_res <- list(studyxml="true")
 
     # both query and tframe have to be null, empty, or wrong type to error out
     if((is.null(query) || query == "") && (is.null(tframe) || !is.data.frame(tframe))) {
@@ -42,14 +47,15 @@ clinicaltrials_download <-
     } else if (!is.null(query)){
 
       aquery <- query
-      query <- paste_query(query)
+      query <- paste_query2(query)
 
       tcount <- clinicaltrials_count(aquery)
 
       if(is.null(count)) {  # return all results
 
         query_url <- "http://clinicaltrials.gov/ct2/results?"
-        final_urls <- c(paste0(query_url, query, inc_res))
+        final_urls <- NULL #c(paste0(query_url, query, inc_res))
+        final_query <- c(query, inc_res)
         count <- tcount
 
       } else {
@@ -59,17 +65,18 @@ clinicaltrials_download <-
 
         if(tcount > 100 & count > 100){
 
-          count_str <- paste0("&count=", 100)
+          count_str <- list(count=100)
           warning("Count is too large (>100), only returning top 100 results. Use query and count = NULL to return all results")
 
         } else {
 
-          count_str <- paste0("&count=", as.integer(count))
+          count_str <- list(count=as.integer(count))
 
         }
 
         query_url <- "http://clinicaltrials.gov/ct2/results?"
-        final_urls <- c(paste0(query_url, query, count_str, inc_res))
+        final_urls <- NULL #c(paste0(query_url, query, count_str, inc_res))
+        final_query <- c(query, count_str, inc_res)
 
       }
     } else if(!is.null(tframe)) {
@@ -89,12 +96,14 @@ clinicaltrials_download <-
       }
 
       final_urls <- character() # define empty vector
+      final_query <- NULL
       for (i in seq(from=1, to=tcount, by=100)) # loop to add urls to final_urls vector
       {
         end <- ifelse(i + 99 > tcount, tcount, i + 99) # gives endpoint of current loop iteration
         dex <- i:end
         query_url <- "http://clinicaltrials.gov/ct2/results?id="
-        final_urls <- c(final_urls, paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"), inc_res)) # append to vector
+        final_urls <- c(final_urls, paste0(query_url, paste(tframe$nct_id[dex], collapse = "+OR+"),
+                                           ifelse(include_results, "&resultsxml=true", "&studyxml=true"))) # append to vector
       }
 
     } else stop("No search performed")
@@ -110,19 +119,26 @@ clinicaltrials_download <-
     }
     stopifnot(create)
 
-    ## loop through URLs, download and extract into temporary directory
+    if(!is.null(final_urls)) {
+      ## loop through URLs, download and extract into temporary directory
 
-    for (final_url in final_urls) {
+      for (final_url in final_urls) {
 
+        tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
+
+        result <- httr::GET(final_url, httr::write_disk(tmpzip))
+
+        #writeBin(httr::content(search_result, as = "raw"), tmpzip)
+
+        utils::unzip(tmpzip, exdir = tmpdir)
+
+        Sys.sleep(0.1) # sleep 0.1 sec as requested by Crawl-delay parameter in http://www.clinicaltrials.gov/robots.txt
+      }
+    } else if(!is.null(final_query)) {
       tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
-
-      result <- httr::GET(final_url, httr::write_disk(tmpzip))
-
-      #writeBin(httr::content(search_result, as = "raw"), tmpzip)
+      result <- httr::GET(query_url, query = final_query, httr::write_disk(tmpzip))
 
       utils::unzip(tmpzip, exdir = tmpdir)
-
-      Sys.sleep(0.1) # sleep 0.1 sec as requested by Crawl-delay parameter in http://www.clinicaltrials.gov/robots.txt
     }
 
     # get files list

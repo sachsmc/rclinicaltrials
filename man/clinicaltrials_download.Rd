@@ -38,6 +38,11 @@ warning. To return all results, use a query string and set count to NULL.
 # trials satisfying 'heart disease AND stroke AND California'
 \dontrun{clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)}
 
+# advanced search for open, interventional trials involving melanoma
+\dontrun{clinicaltrials_download(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))}
+
+# can also use a named list
+\dontrun{clinicaltrials_download(query = list(recr='Open', type='Intr', cond='melanoma'))}
 
 }
 

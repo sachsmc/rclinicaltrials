@@ -24,5 +24,8 @@ attempting to pull down a very large number of records.
 # advanced search for open, interventional trials involving melanoma
 \dontrun{clinicaltrials_count(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))}
 
+# can also use a named list
+\dontrun{clinicaltrials_count(query = list(recr='Open', type='Intr', cond='melanoma'))}
+
 }
 
