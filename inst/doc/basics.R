@@ -5,7 +5,7 @@
 
 ## ------------------------------------------------------------------------
 library(rclinicaltrials)
-library(ggplot2)
+#library(ggplot2)
 library(plyr)
 
 z <- clinicaltrials_search(query = 'lime+disease')
@@ -38,10 +38,13 @@ melanom2 <- clinicaltrials_search(query = list(cond = "melanoma", phase = "2",
 nrow(melanom)
 
 
-## ----fig, fig.width = 6.5, fig.height = 5--------------------------------
+## ----check---------------------------------------------------------------
 melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
                                                          "type=Intr", "rslt=With"), 
                                                count = 1e6, include_results = TRUE)
+
+## ----fig, fig.width = 6.5, fig.height = 5--------------------------------
+
 summary(melanom_information$study_results$baseline_data)
 
 gend_data <- subset(melanom_information$study_results$baseline_data, 
@@ -62,10 +65,18 @@ counts <- merge(gender_counts, dates, by = "nct_id")
 
 cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
 colnames(cts)[2] <- "Gender"
-p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
-  geom_line() + geom_point() + 
-  labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
-  scale_y_continuous("Cumulative Enrollment") + 
-  scale_x_continuous(breaks = 2000:2012)
-p
+
+cts <- ddply(subset(cts, !is.na(Gender) & year != 2012), ~ Gender, mutate, cumulative.count = cumsum(count))
+
+plot(cumulative.count ~ year, data = subset(cts, Gender = "Female"), type = "b", 
+     col = "salmon", main = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender")
+lines(cumulative.count ~ year, data = subset(cts, Gender == "Male"), type = "b", col = "blue")
+legend("topleft", fill = c("salmon", "blue"), legend = c("Female", "Male"))
+
+#ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
+#  geom_line() + geom_point() + 
+#  labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
+#  scale_y_continuous("Cumulative Enrollment") + 
+#  scale_x_continuous(breaks = 2000:2012)
+
 
