@@ -1,4 +1,4 @@
-This is a resubmission. 
+This is a resubmission to address a few issues. 
 
 Modified the description to read: 
 
@@ -10,7 +10,7 @@ ClinicalTrials.gov is a registry and results database of publicly
     and download features. Results are downloaded to temporary directories and
     returned as R objects.
     
-Kurt reported the following error. I was able to reproduce the error using travis CI. I changed a couple things in the vignette that fixes it.
+Kurt reported the following error. I was able to reproduce the error using travis CI. It was apparently a ggplot2 error, so I switched to base R plots and removed the Suggested dependency on ggplot2. 
 
 * checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:

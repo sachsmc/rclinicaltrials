@@ -5,8 +5,8 @@
 
 ## ------------------------------------------------------------------------
 library(rclinicaltrials)
-#library(ggplot2)
-library(plyr)
+library(ggplot2)
+library(dplyr)
 
 z <- clinicaltrials_search(query = 'lime+disease')
 str(z)
@@ -50,33 +50,23 @@ summary(melanom_information$study_results$baseline_data)
 gend_data <- subset(melanom_information$study_results$baseline_data, 
                     title == "Gender" & arm != "Total")
 
-gender_counts <- ddply(gend_data, ~ nct_id + subtitle, function(df){
-  
-  data.frame(
-    count = sum(as.numeric(paste(df$value)), na.rm = TRUE)
-    )
-  
-})
+gender_counts <- gend_data %>% group_by(nct_id, subtitle) %>% 
+  do( data.frame(
+    count = sum(as.numeric(paste(.$value)), na.rm = TRUE)
+    ))
 
 dates <- melanom_information$study_information$study_info[, c("nct_id", "start_date")]
 dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.numeric(d[2]))
 
 counts <- merge(gender_counts, dates, by = "nct_id")
 
-cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
+cts <- counts %>% group_by(year, subtitle) %>%
+  summarize(count = sum(count))
 colnames(cts)[2] <- "Gender"
 
-cts <- ddply(subset(cts, !is.na(Gender) & year != 2012), ~ Gender, mutate, cumulative.count = cumsum(count))
-
-plot(cumulative.count ~ year, data = subset(cts, Gender = "Female"), type = "b", 
-     col = "salmon", main = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender")
-lines(cumulative.count ~ year, data = subset(cts, Gender == "Male"), type = "b", col = "blue")
-legend("topleft", fill = c("salmon", "blue"), legend = c("Female", "Male"))
-
-#ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
-#  geom_line() + geom_point() + 
-#  labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
-#  scale_y_continuous("Cumulative Enrollment") + 
-#  scale_x_continuous(breaks = 2000:2012)
+ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
+  geom_line() + geom_point() + 
+  labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
+  scale_y_continuous("Cumulative Enrollment") 
 
 

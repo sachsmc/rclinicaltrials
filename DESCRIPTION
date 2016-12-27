@@ -25,7 +25,7 @@ Suggests:
     knitr,
     roxygen2,
     testthat,
-    ggplot2
+    dplyr
 VignetteBuilder: knitr
 LazyData: true
 RoxygenNote: 5.0.1
