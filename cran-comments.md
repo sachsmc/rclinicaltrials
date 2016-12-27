@@ -10,7 +10,7 @@ ClinicalTrials.gov is a registry and results database of publicly
     and download features. Results are downloaded to temporary directories and
     returned as R objects.
     
-Kurt reported the following error. I was able to reproduce the error using travis CI. It was apparently a ggplot2 error, so I switched to base R plots and removed the Suggested dependency on ggplot2. 
+Kurt reported the following error. I was able to reproduce the error using travis CI. It was apparently a plyr error. 
 
 * checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:
