@@ -3,7 +3,8 @@ Type: Package
 Title: Download Aggregate Trial Information and Results from ClinicalTrials.gov
 Description: ClinicalTrials.gov is a registry and results database of publicly
     and privately supported clinical studies of human participants conducted
-    around the world. Users can search for information about and results from
+    around the world (see <https://clinicaltrials.gov/> for more information). 
+    Users can search for information about and results from
     those trials. This provides a set of functions to interact with the search
     and download features. Results are downloaded to temporary directories and
     returned as R objects.

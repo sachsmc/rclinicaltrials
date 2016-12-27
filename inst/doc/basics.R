@@ -5,6 +5,9 @@
 
 ## ------------------------------------------------------------------------
 library(rclinicaltrials)
+library(ggplot2)
+library(plyr)
+
 z <- clinicaltrials_search(query = 'lime+disease')
 str(z)
 
@@ -38,8 +41,6 @@ summary(melanom_information$study_results$baseline_data)
 gend_data <- subset(melanom_information$study_results$baseline_data, 
                     title == "Gender" & arm != "Total")
 
-library(plyr)
-
 gender_counts <- ddply(gend_data, ~ nct_id + subtitle, function(df){
   
   data.frame(
@@ -54,7 +55,6 @@ dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.nume
 counts <- merge(gender_counts, dates, by = "nct_id")
 
 ## ----fig-----------------------------------------------------------------
-library(ggplot2)
 cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
 colnames(cts)[2] <- "Gender"
 p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
