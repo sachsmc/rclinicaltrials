@@ -10,7 +10,7 @@ ClinicalTrials.gov is a registry and results database of publicly
     and download features. Results are downloaded to temporary directories and
     returned as R objects.
     
-Kurt reported the following error. I was able to reproduce the error using travis CI. It was apparently a plyr error. 
+Kurt reported the following error. I was able to reproduce the error using travis CI. It is cause by something to do with the temporary directory created for the downloads. I don't exactly know what's causing it (doesn't occur in the tests) but I implemented a workaround. 
 
 * checking re-building of vignette outputs ... WARNING
 Error in re-building vignettes:

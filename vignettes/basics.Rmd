@@ -89,10 +89,14 @@ nrow(melanom)
 
 Now to download the data and summarize it:
 
-```{r check}
+```{r check, eval = FALSE}
 melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
                                                          "type=Intr", "rslt=With"), 
                                                count = 1e6, include_results = TRUE)
+```
+
+```{r reup, include = FALSE}
+load("melanom_info.RData")
 ```
 
 ```{r fig, fig.width = 6.5, fig.height = 5}

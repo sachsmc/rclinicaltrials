@@ -38,10 +38,13 @@ melanom2 <- clinicaltrials_search(query = list(cond = "melanoma", phase = "2",
 nrow(melanom)
 
 
-## ----check---------------------------------------------------------------
-melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
-                                                         "type=Intr", "rslt=With"), 
-                                               count = 1e6, include_results = TRUE)
+## ----check, eval = FALSE-------------------------------------------------
+#  melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2",
+#                                                           "type=Intr", "rslt=With"),
+#                                                 count = 1e6, include_results = TRUE)
+
+## ----reup, include = FALSE-----------------------------------------------
+load("melanom_info.RData")
 
 ## ----fig, fig.width = 6.5, fig.height = 5--------------------------------
 
