@@ -1,24 +1,4 @@
-This is a resubmission to address a few issues. 
+This is a resubmission to address a critical bug: 
 
-Modified the description to read: 
+Kurt reported the following error. I was able to reproduce the error using travis CI. It is cause by something to do with the temporary directory created for the downloads. I don't exactly know what's causing it (doesn't occur in the tests) but I implemented a workaround by removing the "unlink(tmpdir)" calls. This led to another bug that meant old downloaded results were being used instead of the new ones. This update fixes that. 
 
-ClinicalTrials.gov is a registry and results database of publicly
-    and privately supported clinical studies of human participants conducted
-    around the world (see <https://clinicaltrials.gov/> for more information). 
-    Users can search for information about and results from
-    those trials. This provides a set of functions to interact with the search
-    and download features. Results are downloaded to temporary directories and
-    returned as R objects.
-    
-Kurt reported the following error. I was able to reproduce the error using travis CI. It is cause by something to do with the temporary directory created for the downloads. I don't exactly know what's causing it (doesn't occur in the tests) but I implemented a workaround by removing the "unlink(tmpdir)" calls. Please let me know if this is likely to cause further problems. 
-
-* checking re-building of vignette outputs ... WARNING
-Error in re-building vignettes:
-  ...
-Quitting from lines 120-121 (basics.Rmd)
-Error: processing vignette ‘basics.Rmd’ failed with diagnostics:
-could not open file '/tmp/RtmpIdpGfT/file4b442c9302cc'
-Execution halted
-
-
-This update also includes some changes to the GET calls, to handle accented characters on linux environments. 

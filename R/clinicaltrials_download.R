@@ -119,6 +119,7 @@ clinicaltrials_download <-
     }
     stopifnot(create)
 
+    unzipped.files <- NULL
     if(!is.null(final_urls)) {
       ## loop through URLs, download and extract into temporary directory
 
@@ -130,7 +131,7 @@ clinicaltrials_download <-
 
         #writeBin(httr::content(search_result, as = "raw"), tmpzip)
 
-        utils::unzip(tmpzip, exdir = tmpdir)
+        unzipped.files <- c(unzipped.files, utils::unzip(tmpzip, exdir = tmpdir))
 
         Sys.sleep(0.1) # sleep 0.1 sec as requested by Crawl-delay parameter in http://www.clinicaltrials.gov/robots.txt
       }
@@ -138,12 +139,12 @@ clinicaltrials_download <-
       tmpzip <- tempfile(fileext = ".zip", tmpdir = tmpdir)
       result <- httr::GET(query_url, query = final_query, httr::write_disk(tmpzip))
 
-      utils::unzip(tmpzip, exdir = tmpdir)
+      unzipped.files <- c(unzipped.files, utils::unzip(tmpzip, exdir = tmpdir))
     }
 
     # get files list
 
-    xml_list <- paste(tmpdir, list.files(path = tmpdir, pattern = "xml$")[1:min(tcount, count)], sep = "/")
+    xml_list <- unzipped.files[1:min(tcount, count)]
     info_list <- lapply(xml_list, parse_study_xml, include_textblocks)
 
     if(include_results) {
