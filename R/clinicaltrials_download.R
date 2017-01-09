@@ -151,13 +151,13 @@ clinicaltrials_download <-
 
       results_list <- lapply(xml_list, function(file) gather_results(XML::xmlParse(file)))
 
-      #unlink(tmpdir, recursive = TRUE)
+      unlink(unzipped.files)
 
       list(study_information = do.call("mapply", args = c(FUN = plyr::rbind.fill, info_list)),
          study_results = do.call("mapply", args = c(FUN = plyr::rbind.fill, results_list)))
     } else {
 
-    #unlink(tmpdir, recursive = TRUE)
+      unlink(unzipped.files)
 
     # listwise rbind
 
