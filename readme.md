@@ -8,6 +8,8 @@ Note that the clinicaltrials.gov API _does not_ require an API key.
 
 The [rclinicaltrials](http://github.com/sachsmc/rclinicaltrials) package is ongoing development.
 
+An alternative to using this package would be to connect to the AACT Database via R or other software: 
+https://aact-prod.herokuapp.com/connect
 
 ### Installation
 
