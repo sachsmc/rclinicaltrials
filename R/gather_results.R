@@ -1,16 +1,24 @@
 #' Parses results from an xml object downloaded from clinicaltrials.gov
 #'
 #' Results of a clinical study are stored in a particular way. This reads and
-#' organizes the information and returns it as a list of dataframes. Throws an error if the xml has no \code{clinical_results} node.
+#' organizes the information and returns it as a list of dataframes. Throws an
+#' error if the xml has no \code{clinical_results} node.
 #'
-#' @param parsed A parsed XML object, as returned by \code{XML::xmlParse}
+#' @param file The name of the file containing the XML contents. Can also be a URL.
+#'   To be used with \code{XML::xmlParse} and \code{xml2::read_xml}
 #' @keywords Internal
 #'
 #' @return A list of \code{data.frame}s, participant flow, baseline data,
 #'   outcome results
 #'
 
-gather_results <- function(parsed){
+gather_results <- function(file){
+
+  #A parsed file for use with XML package
+  parsed = XML::xmlParse(file)
+
+  #An XML document for use with xml2 package
+  x2 = xml2::read_xml(file)
 
   check <- tryCatch(parsed[["//clinical_results"]],  error = function(e) {
     return(NULL)
@@ -118,101 +126,202 @@ gather_results <- function(parsed){
 
   #parsed_out <- xml2::xml_find_all(x, ".//outcome")
 
-  all_results_list <- XML::xmlApply(parsed[["//clinical_results/outcome_list"]], function(parsed_out){
+  # all_results_list <- XML::xmlApply(parsed[["//clinical_results/outcome_list"]], function(parsed_out){
+  #
+  #   gp_look <- get_group_lookup(parsed_out, "group_list")
+  #
+  #   measures <- parsed_out[["measure_list"]]
+  #   analysis <- parsed_out[["analysis_list"]]
+  #
+  #   results_titles <- XML::xmlApply(parsed_out, function(node){
+  #
+  #     if(XML::xmlName(node) %in% c("group_list", "measure_list", "analysis_list")) return(NULL) else {
+  #
+  #       XML::xmlValue(node)
+  #
+  #     }
+  #
+  #   })
+  #
+  #   if(!is.null(measures)) {
+  #     results_table <- do.call(plyr::rbind.fill, XML::xmlApply(measures, function(node){
+  #
+  #       #outer most level: titles and units
+  #       lank <- XML::xmlSApply(node, function(n){
+  #         # category_list -> return sub-titles
+  #         if(XML::xmlName(n) == "category_list"){
+  #
+  #           do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
+  #             data.frame(
+  #               cbind(
+  #                 subtitle = XML::xmlValue(n0),
+  #                 t(XML::xmlSApply(n0[["measurement_list"]], XML::xmlAttrs)),
+  #                 stringsAsFactors = FALSE),
+  #               row.names = NULL, stringsAsFactors = FALSE)
+  #           }))
+  #
+  #         } else {
+  #
+  #           XML::xmlValue(n)
+  #
+  #         }
+  #       })
+  #
+  #       target <- lank$category_list
+  #       fillout <- lank[names(lank) != "category_list"]
+  #       cbind(fillout, target)
+  #
+  #     }))
+  #
+  #     results_table$arm <- gp_look[results_table$group_id]
+  #
+  #     measures_table <- cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")],
+  #           results_table)
+  #
+  #   } else measures_table <- data.frame(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")])
+  #
+  #   if(!is.null(analysis)){
+  #
+  #     analysis_table <- do.call(plyr::rbind.fill, XML::xmlApply(analysis, function(node){
+  #
+  #       lank <- as.data.frame(XML::xmlApply(node, function(n){
+  #
+  #         if(XML::xmlName(n) == "group_id_list"){
+  #
+  #           data.frame(group_id = XML::xmlSApply(n, XML::xmlValue), stringsAsFactors = FALSE)
+  #
+  #         } else {
+  #
+  #           tmp <- data.frame(XML::xmlValue(n), stringsAsFactors = FALSE)
+  #           colnames(tmp) <- XML::xmlName(n)
+  #           tmp
+  #
+  #         }
+  #       }), stringsAsFactors = FALSE)
+  #
+  #     }))
+  #
+  #     analysis_table$arm <- gp_look[analysis_table$group_id]
+  #
+  #     analysis_table <- cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")],
+  #           analysis_table)
+  #
+  #   } else analysis_table <- data.frame(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")])
+  #
+  #
+  #   if(is.null(analysis)){
+  #     measures_table
+  #   } else if(is.null(measures)){
+  #     analysis_table
+  #   } else {
+  #     plyr::rbind.fill(measures_table, analysis_table)
+  #   }
+  #
+  #
+  # })
+  #
+  # final_outcome_table <- do.call(plyr::rbind.fill, all_results_list)
+  # final_outcome_table$nct_id <- this_nct_id
 
-    gp_look <- get_group_lookup(parsed_out, "group_list")
+  #Function to retreive outcome estimates
+  #This function takes in an outcome node and returns a dataframe with trial outcome data
+  getMeasures <- function(outcome) {
+    measure <- xml2::xml_child(outcome, "measure")
 
-    measures <- parsed_out[["measure_list"]]
-    analysis <- parsed_out[["analysis_list"]]
+    #If outcome has no measure information, skip to next outcome
+    if(is.na(xml2::xml_text(measure))) return(data.frame())
 
-    results_titles <- XML::xmlApply(parsed_out, function(node){
+    #Get basic information for each outcome (top level)
+    details <- data.frame(
+      type <- xml2::xml_text(xml2::xml_child(outcome, "type")),
+      title <- xml2::xml_text(xml2::xml_child(outcome, "title")),
+      desciption <- xml2::xml_text(xml2::xml_child(outcome, "description")),
+      timeframe <- xml2::xml_text(xml2::xml_child(outcome, "time_frame")),
+      population <- xml2::xml_text(xml2::xml_child(outcome, "population")),
+      units <- xml2::xml_text(xml2::xml_child(measure, "units")),
+      param <- xml2::xml_text(xml2::xml_child(measure, "param")),
+      dispersion <- xml2::xml_text(xml2::xml_child(measure, "dispersion"))
+    )
 
-      if(XML::xmlName(node) %in% c("group_list", "measure_list", "analysis_list")) return(NULL) else {
+    #Assign column names
+    names(details) <- c("type", "title", "description",
+                        "time_frame", "population",
+                        "units", "param", "dispersion")
 
-        XML::xmlValue(node)
-
-      }
-
-    })
-
-    if(!is.null(measures)) {
-      results_table <- do.call(plyr::rbind.fill, XML::xmlApply(measures, function(node){
-
-        #outer most level: titles and units
-        lank <- XML::xmlSApply(node, function(n){
-          # category_list -> return sub-titles
-          if(XML::xmlName(n) == "category_list"){
-
-            do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
-              data.frame(
-                cbind(
-                  subtitle = XML::xmlValue(n0),
-                  t(XML::xmlSApply(n0[["measurement_list"]], XML::xmlAttrs)),
-                  stringsAsFactors = FALSE),
-                row.names = NULL, stringsAsFactors = FALSE)
-            }))
-
-          } else {
-
-            XML::xmlValue(n)
-
-          }
-        })
-
-        target <- lank$category_list
-        fillout <- lank[names(lank) != "category_list"]
-        cbind(fillout, target)
-
-      }))
-
-      results_table$arm <- gp_look[results_table$group_id]
-
-      measures_table <- cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")],
-            results_table)
-
-    } else measures_table <- data.frame(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")])
-
-    if(!is.null(analysis)){
-
-      analysis_table <- do.call(plyr::rbind.fill, XML::xmlApply(analysis, function(node){
-
-        lank <- as.data.frame(XML::xmlApply(node, function(n){
-
-          if(XML::xmlName(n) == "group_id_list"){
-
-            data.frame(group_id = XML::xmlSApply(n, XML::xmlValue), stringsAsFactors = FALSE)
-
-          } else {
-
-            tmp <- data.frame(XML::xmlValue(n), stringsAsFactors = FALSE)
-            colnames(tmp) <- XML::xmlName(n)
-            tmp
-
-          }
-        }), stringsAsFactors = FALSE)
-
-      }))
-
-      analysis_table$arm <- gp_look[analysis_table$group_id]
-
-      analysis_table <- cbind(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")],
-            analysis_table)
-
-    } else analysis_table <- data.frame(results_titles[!names(results_titles) %in% c("group_list", "measure_list", "analysis_list")])
-
-
-    if(is.null(analysis)){
-      measures_table
-    } else if(is.null(measures)){
-      analysis_table
-    } else {
-      plyr::rbind.fill(measures_table, analysis_table)
+    #Get group names function
+    getArms <- function(arm) {
+      grp <- xml2::xml_attr(arm, "group_id")
+      title <- xml2::xml_text(xml2::xml_child(arm, "title"))
+      details <- xml2::xml_text(xml2::xml_child(arm, "description"))
+      return(c(grp, title, details))
     }
 
+    #Get names of each group (level 2)
+    grpList <- xml2::xml_find_all(outcome, ".//group")
+    arms <- data.frame(t(sapply(grpList, getArms)))
+    names(arms) <- c("group_id", "arm", "details")
 
-  })
+    #Get sample size function
+    getSize <- function(count) {
+      group_id <- xml2::xml_attr(count, "group_id")
+      sample <- xml2::xml_attr(count, "value")
+      return(c(group_id, sample))
+    }
 
-  final_outcome_table <- do.call(plyr::rbind.fill, all_results_list)
+    #Get sample size for each group (level 2)
+    counts <- xml2::xml_find_all(outcome, ".//count")
+    # size <- data.frame(t(sapply(xml2::xml_attrs(count), c)))
+    size <- data.frame(t(sapply(counts, getSize)))
+    names(size) <- c("group_id", "sample")
+
+    #Join group names and sample sizes by ID
+    groups = dplyr::left_join(arms, size, by="group_id")
+
+    #Get outcome estimates function
+    getEstimates = function(class) {
+      #Get estimates (level 3)
+      mesList <- xml2::xml_find_all(class, ".//measurement")
+      estimates <- plyr::ldply(xml2::xml_attrs(mesList), rbind)
+
+      #Get comments & subtitle for each estimate
+      estimates$comment <- xml2::xml_text(mesList)
+      estimates$subtitle <- xml2::xml_text(xml2::xml_child(class, "title"))
+
+      return(estimates)
+    }
+
+    #Get estimates (level 3) and bind to dataframe
+    #Also checks for subtitles; returns NA if not present
+    classes <- xml2::xml_find_all(outcome, ".//class")
+    l2 <- lapply(classes, getEstimates)
+    est <- plyr::rbind.fill(l2)
+
+    #Add group sizes and names if estimates aren't NA
+    if (!is.null(est)) {
+      #Coerce group_id to character to prevent loss of factors
+      groups$group_id = as.character(groups$group_id)
+      est$group_id = as.character(est$group_id)
+
+      #Join estimates with group information
+      estimates <- dplyr::full_join(groups, est, by = c("group_id"))
+      # estimates <- dplyr::left_join(est, groups, by = c("group_id"))
+    } else {estimates <- groups}
+
+    #Expand details to match number of estimates returned
+    details <- details[rep(1, each = nrow(estimates)), ]
+
+    #Merge outcome details with estimates dataframe
+    res <- dplyr::bind_cols(details, estimates)
+
+    #Return result
+    return(res)
+  }
+
+  #Find all outcome nodes
+  outcomes <- xml2::xml_find_all(x2, ".//outcome")
+
+  ##Extract outcome data from nodes and get results
+  final_outcome_table <- plyr::rbind.fill(lapply(outcomes, getMeasures))
   final_outcome_table$nct_id <- this_nct_id
 
   list(

@@ -149,7 +149,10 @@ clinicaltrials_download <-
 
     if(include_results) {
 
-      results_list <- lapply(xml_list, function(file) gather_results(XML::xmlParse(file)))
+      #Changed the arguement for gather results to the XML filename
+      #File is parsed within the gather_results function so xml_read() can be used with xml2 package
+      # results_list <- lapply(xml_list, function(file) gather_results(XML::xmlParse(file)))
+      results_list <- lapply(xml_list, function(file) gather_results(file))
 
       unlink(unzipped.files)
 
