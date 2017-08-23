@@ -27,7 +27,7 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
   ## basic study info
 
   infoterms <- c("brief_title", "official_title", "overall_status", "start_date", "completion_date", "lead_sponsor/agency", "overall_official",
-                 "phase", "study_type", "study_design", "enrollment", "primary_condition", "primary_outcome", "eligibility", "sponsors")
+                 "phase", "study_type", "study_design_info", "enrollment", "primary_condition", "primary_outcome", "eligibility", "sponsors")
 
   study_info <- ids
 
