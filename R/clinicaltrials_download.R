@@ -144,7 +144,7 @@ clinicaltrials_download <-
 
     # get files list
 
-    xml_list <- unzipped.files[1:min(tcount, count)]
+    xml_list <- na.omit(unzipped.files[1:min(tcount, count)]) # drops NAs if number of downloaded files is smaller than search list
     info_list <- lapply(xml_list, parse_study_xml, include_textblocks)
 
     if(include_results) {
