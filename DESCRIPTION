@@ -18,7 +18,8 @@ License: MIT + file LICENSE
 Imports:
     httr,
     XML,
-    plyr
+    plyr,
+    stats
 Suggests:
     rmarkdown,
     devtools,
