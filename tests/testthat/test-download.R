@@ -25,7 +25,7 @@ test_that("download function returns correct format", {
 
 
   nores <- clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5)
-  res <- clinicaltrials_download(query = 'heart disease AND stroke AND California', count = 5, include_results = TRUE)
+  res <- clinicaltrials_download(query = 'heart disease AND stroke AND Arkansas', count = 5, include_results = TRUE)
 
   expect_equal(length(unique(nores$study_info$nct_id)), 5)
 
