@@ -118,10 +118,14 @@ gather_results <- function(parsed){
         }
       })
 
-      names(lank)[names(lank) == "class_list"] <- "category_list"
-      target <- lank$category_list
-      fillout <- lank[names(lank) != "category_list"]
-      cbind(fillout, target)
+      if (any(names(lank) == "class_list", na.rm = T)) {
+        names(lank)[names(lank) == "class_list"] <- "category_list"
+        target <- lank$category_list
+        fillout <- lank[names(lank) != "category_list"]
+        cbind(fillout, target)
+      } else {
+        data.frame(lank)
+      }
 
     }))
 
@@ -177,9 +181,13 @@ gather_results <- function(parsed){
           }
         })
 
-        target <- lank$category_list
-        fillout <- lank[names(lank) != "category_list"]
-        cbind(fillout, target)
+        if (is.recursive(lank)) {
+          target <- lank$category_list
+          fillout <- lank[names(lank) != "category_list"]
+          cbind(fillout, target)
+        } else {
+          data.frame(lank)
+        }
 
       }))
 
