@@ -61,6 +61,6 @@ frame_studylist <- function(listitem){
 
   if(names(listitem) %in% c("query", ".attrs", "comment")) return(NULL)
 
-  as.data.frame(unlist(listitem), stringsAsFactors = FALSE)
+  as.data.frame(t(listitem[[1]]), stringsAsFactors = FALSE)
 
 }
