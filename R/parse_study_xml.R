@@ -36,7 +36,12 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
     if(infoterms[i] == "primary_condition"){
 
       infoterm <- "condition"
-      study_info[infoterms[i]] <- XML::xmlValue(parsed[paste0("//", infoterm)][[1]])
+      innterm <- parsed[paste0("//", infoterm)]
+      if(length(innterm) > 1) {
+        study_info[infoterms[i]] <- paste(sapply(innterm, XML::xmlValue), collapse = "; ")
+      } else {
+        study_info[infoterms[i]] <- XML::xmlValue(innterm[[1]])
+      }
 
     } else {
 

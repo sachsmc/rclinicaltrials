@@ -17,15 +17,18 @@
 #' # advanced search for open, interventional trials involving melanoma
 #' \dontrun{clinicaltrials_count(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))}
 #'
+#' # can also use a named list
+#' \dontrun{clinicaltrials_count(query = list(recr='Open', type='Intr', cond='melanoma'))}
+#'
 clinicaltrials_count <-
   function(query = NULL)
   {
     query_url <- "http://clinicaltrials.gov/ct2/results?"
 
-    query <- paste_query(query)
+    final_query <- paste_query2(query)
 
     # do search
-    search_result <- httr::GET(paste0(query_url, query, "&displayxml=true"))
+    search_result <- httr::GET(query_url, query = c(final_query, displayxml="true"))
 
     parsed_result <- XML::xmlParse(httr::content(search_result, as = "text"))
     # extract search results div
@@ -49,3 +52,25 @@ paste_query <-
   }
 
 
+paste_query2 <-
+  function(query)
+  {
+
+    if(!is.list(query)){
+      if(is.null(query)) return(list(term = ""))
+      if(length(query) == 1) return(list(term = query))
+      nms <- lapply(strsplit(query, "="), '[', 1)
+      query <- lapply(strsplit(query, "="), '[', 2)
+      names(query) <- nms
+      return(query)
+    }
+
+    if(is.null(query) || length(query)==1){
+      nquery <- list(term = query)
+    } else if(!is.null(names(query))) {
+      nquery <- query
+    } else {
+      nquery <- paste(query, collapse="&")
+    }
+    nquery
+  }

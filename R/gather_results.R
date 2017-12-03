@@ -53,46 +53,88 @@ gather_results <- function(parsed){
 
   gp_look <- get_group_lookup(parsed, "//baseline/group_list")
 
-  measures <- parsed[["//baseline/measure_list"]]
+  # measures <- parsed[["//baseline/measure_list"]]
 
-  baseline_table <- do.call(plyr::rbind.fill, XML::xmlApply(measures, function(node){
+  # Error catcher to pick up an NCT ID causing error that tracebacks to here:
+  # check <- tryCatch(parsed[["//baseline/measure_list"]],  error = function(e) {
+  #   print(paste("Error in //baseline/measure_list, NCT ID throwing error is: ", this_nct_id))
+  #   return(NULL)
+  # })
+  # Result: "Error in //baseline/measure_list, NCT ID throwing error is:  NCT01602016"
 
-    #outer most level: titles and units
-    lank <- XML::xmlSApply(node, function(n){
-      # category_list -> return sub-titles
-      if(XML::xmlName(n) == "category_list"){
+  # Check to see if baseline measures exist using get_group_lookup function
+  # If no, set baseline arm to NA and continue
+  # If yes, parse baseline measures
 
-        do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
+  if (is.null(get_group_lookup(parsed, "//baseline/measure_list"))) {
+    baseline_table <- data.frame("arm" = c(NA))
+  } else {
+    baseline_table <- do.call(plyr::rbind.fill, XML::xmlApply(parsed[["//baseline/measure_list"]], function(node){
 
-          tmpRes <- XML::xmlApply(n0[["measurement_list"]], function(x){
+      #outer most level: titles and units
+      lank <- XML::xmlSApply(node, function(n){
+        # category_list -> return sub-titles
+        if(XML::xmlName(n) == "category_list"){
 
-            as.data.frame(t(XML::xmlAttrs(x)), stringsAsFactors = FALSE)
+          do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
 
-          })
-          ResAdd <- do.call(plyr::rbind.fill, tmpRes)
-          data.frame(
-            cbind(
-              subtitle = XML::xmlValue(n0),
-              ResAdd,
-              stringsAsFactors = FALSE),
-            row.names = NULL, stringsAsFactors = FALSE)
-        }))
+            tmpRes <- XML::xmlApply(n0[["measurement_list"]], function(x){
 
+              as.data.frame(t(XML::xmlAttrs(x)), stringsAsFactors = FALSE)
+
+            })
+            ResAdd <- do.call(plyr::rbind.fill, tmpRes)
+            data.frame(
+              cbind(
+                subtitle = XML::xmlValue(n0),
+                ResAdd,
+                stringsAsFactors = FALSE),
+              row.names = NULL, stringsAsFactors = FALSE)
+          }))
+
+        } else if(XML::xmlName(n) == "class_list"){
+
+          do.call(plyr::rbind.fill, XML::xmlApply(n, function(n0){
+
+            subtitle <- XML::xmlValue(n0[["title"]])
+            tmpRes <- XML::xmlApply(n0[["category_list"]][["category"]][["measurement_list"]], function(x){
+
+              as.data.frame(t(XML::xmlAttrs(x)), stringsAsFactors = FALSE)
+
+            })
+            ResAdd <- do.call(plyr::rbind.fill, tmpRes)
+            data.frame(
+              cbind(
+                subtitle = subtitle,
+                ResAdd,
+                stringsAsFactors = FALSE),
+              row.names = NULL, stringsAsFactors = FALSE)
+          }))
+
+        } else {
+
+          XML::xmlValue(n)
+
+        }
+      })
+
+      if (any(names(lank) == "class_list", na.rm = T)) {
+        names(lank)[names(lank) == "class_list"] <- "category_list"
+        target <- lank$category_list
+        fillout <- lank[names(lank) != "category_list"]
+        cbind(fillout, target)
       } else {
-
-        XML::xmlValue(n)
-
+        data.frame(lank)
       }
-    })
 
-    target <- lank$category_list
-    fillout <- lank[names(lank) != "category_list"]
-    cbind(fillout, target)
+    }))
 
-  }))
+    baseline_table$arm <- gp_look[baseline_table$group_id]
 
-  baseline_table$arm <- gp_look[baseline_table$group_id]
+  }
+
   baseline_table$nct_id <- this_nct_id
+
 
   ## outcomes
 
@@ -139,9 +181,13 @@ gather_results <- function(parsed){
           }
         })
 
-        target <- lank$category_list
-        fillout <- lank[names(lank) != "category_list"]
-        cbind(fillout, target)
+        if (is.recursive(lank)) {
+          target <- lank$category_list
+          fillout <- lank[names(lank) != "category_list"]
+          cbind(fillout, target)
+        } else {
+          data.frame(lank)
+        }
 
       }))
 
@@ -232,6 +278,3 @@ xmltodf <- function(parsed_xml, xpath){
                 stringsAsFactors = FALSE)
 
 }
-
-
-

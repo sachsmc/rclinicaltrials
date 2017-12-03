@@ -3,17 +3,17 @@ context("basic searches")
 test_that("all results, no results, and standard search doesn't return error", {
 
   # blank search returns all results
-  expect_more_than(clinicaltrials_count(""), 1000)
-  expect_more_than(clinicaltrials_count(), 1000)
+  expect_gt(clinicaltrials_count(""), 1000)
+  expect_gt(clinicaltrials_count(), 1000)
 
   # random string search returns 0
   expect_equal(clinicaltrials_count("kajshdg028345245lkjh"), 0)
 
   # standard search works
-  expect_more_than(clinicaltrials_count("heart disease"), 1)
+  expect_gt(clinicaltrials_count("heart disease"), 1)
 
   # advanced search works
-  expect_more_than(clinicaltrials_count(query = c('recr=Open', 'type=Intr', 'cond=melanoma')), 1)
+  expect_gt(clinicaltrials_count(query = c('recr=Open', 'type=Intr', 'cond=melanoma')), 1)
 
 
   # blank search returns all results
@@ -26,7 +26,7 @@ test_that("all results, no results, and standard search doesn't return error", {
   expect_equal(nrow(clinicaltrials_search("heart disease", count = 50)), 50)
 
   # advanced search works
-  expect_more_than(nrow(clinicaltrials_search(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))), 10)
+  expect_gt(nrow(clinicaltrials_search(query = c('recr=Open', 'type=Intr', 'cond=melanoma'))), 10)
 
   # count matches search
 

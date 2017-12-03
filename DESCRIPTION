@@ -3,12 +3,13 @@ Type: Package
 Title: Download Aggregate Trial Information and Results from ClinicalTrials.gov
 Description: ClinicalTrials.gov is a registry and results database of publicly
     and privately supported clinical studies of human participants conducted
-    around the world. Users can search for information about and results from
+    around the world (see <https://clinicaltrials.gov/> for more information). 
+    Users can search for information about and results from
     those trials. This provides a set of functions to interact with the search
     and download features. Results are downloaded to temporary directories and
     returned as R objects.
-Version: 1.4.3
-Date: 2016-04-04
+Version: 1.4.7
+Date: 2017-01-09
 Author: Michael C Sachs <sachsmc@gmail.com>
 Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Depends:
@@ -17,12 +18,15 @@ License: MIT + file LICENSE
 Imports:
     httr,
     XML,
-    plyr
+    plyr,
+    stats
 Suggests:
+    rmarkdown,
     devtools,
     knitr,
     roxygen2,
     testthat,
+    dplyr,
     ggplot2
 VignetteBuilder: knitr
 LazyData: true

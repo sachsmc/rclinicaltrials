@@ -1,3 +1,22 @@
+rclinicaltrials 1.4.7
+----------------
+* Bugfix for results download
+
+
+rclinicaltrials 1.4.6
+----------------
+* Bugfix for results download
+* Bugfix for GET call on linux using accented characters
+* Allow queries as named lists
+
+rclinicaltrials 1.4.5
+----------------
+* Bugfix for queries based on tframe (thanks to @titaniumtroop)
+
+rclinicaltrials 1.4.4
+----------------
+* Allow multiple primary conditions
+
 rclinicaltrials 1.4.3
 ----------------
 * returns status from locations/facilities

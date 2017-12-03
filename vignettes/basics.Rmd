@@ -7,7 +7,7 @@ output:
 vignette: >
   %\VignetteIndexEntry{basics}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ## R interface to clinicaltrials.gov
@@ -16,7 +16,7 @@ vignette: >
 
 ### Installation
 
-To install the latest version from github, use
+The package is available on CRAN and can be installed as usual. To install the latest version from github, use
 `devtools::install_github()`, as follows:
 
 ```{r, eval = FALSE}
@@ -32,6 +32,9 @@ The main function is `clinicaltrials_search()`. Here's an example of its use:
 
 ```{r}
 library(rclinicaltrials)
+library(ggplot2)
+library(dplyr)
+
 z <- clinicaltrials_search(query = 'lime+disease')
 str(z)
 ```
@@ -68,7 +71,7 @@ This returns a list of dataframes that have a common key variable: `nct_id`. Opt
 
 The data come from a relational database with lots of text fields, so it may take some effort to get the data into a flat format for analysis. For that reason, results come back from the `clinicaltrials_download` function as a list of dataframes. Each dataframe has a common key variable: `nct_id`. To merge dataframes, use this key. Otherwise, you can analyze the dataframes separately. They are organized into study information, locations, outcomes, interventions, results, and textblocks. Results, where available, is itself a list with three dataframes: participant flow, baseline data, and outcome data. 
 
-Results tables are stored in long format, so there are often multiple rows per study, each corresponding to a different group or outcome. Let's look at an example, the cumulative enrollment of men and women in phase III, melanoma, interventional studies over time. 
+Results tables are stored in long format, so there are often multiple rows per study, each corresponding to a different group or outcome. Let's look at an example, the cumulative enrollment of men and women in phase III, melanoma, interventional studies over time. We can also pass the query as a list of named items.
 
 ```{r}
 melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2", 
@@ -76,46 +79,50 @@ melanom <- clinicaltrials_search(query = c("cond=melanoma", "phase=2",
                                  count = 1e6)
 nrow(melanom)
 table(melanom$status.text)
+
+melanom2 <- clinicaltrials_search(query = list(cond = "melanoma", phase = "2", 
+                                           type = "Intr", rslt = "With"), 
+                                 count = 1e6)
+nrow(melanom)
+
 ```
 
-Now to download the data:
+Now to download the data and summarize it:
 
-```{r}
+```{r check, eval = FALSE}
 melanom_information <- clinicaltrials_download(query = c("cond=melanoma", "phase=2", 
                                                          "type=Intr", "rslt=With"), 
                                                count = 1e6, include_results = TRUE)
+```
+
+```{r reup, include = FALSE}
+load("melanom_info.RData")
+```
+
+```{r fig, fig.width = 6.5, fig.height = 5}
+
 summary(melanom_information$study_results$baseline_data)
 
 gend_data <- subset(melanom_information$study_results$baseline_data, 
                     title == "Gender" & arm != "Total")
 
-library(plyr)
-
-gender_counts <- ddply(gend_data, ~ nct_id + subtitle, function(df){
-  
-  data.frame(
-    count = sum(as.numeric(paste(df$value)), na.rm = TRUE)
-    )
-  
-})
+gender_counts <- gend_data %>% group_by(nct_id, subtitle) %>% 
+  do( data.frame(
+    count = sum(as.numeric(paste(.$value)), na.rm = TRUE)
+    ))
 
 dates <- melanom_information$study_information$study_info[, c("nct_id", "start_date")]
 dates$year <- sapply(strsplit(paste(dates$start_date), " "), function(d) as.numeric(d[2]))
 
 counts <- merge(gender_counts, dates, by = "nct_id")
-```
 
-```{r fig}
-library(ggplot2)
-cts <- ddply(counts, ~ year + subtitle, summarize, count = sum(count))
+cts <- counts %>% group_by(year, subtitle) %>%
+  summarize(count = sum(count))
 colnames(cts)[2] <- "Gender"
-p <- ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
+
+ggplot(cts, aes(x = year, y = cumsum(count), color = Gender)) + 
   geom_line() + geom_point() + 
   labs(title = "Cumulative enrollment into Phase III, \n interventional trials in Melanoma, by gender") + 
-  scale_y_continuous("Cumulative Enrollment") + 
-  scale_x_continuous(breaks = 2000:2012)
-```
+  scale_y_continuous("Cumulative Enrollment") 
 
-```{r plo, fig.width = 6, fig.height = 5}
-#p
 ```
