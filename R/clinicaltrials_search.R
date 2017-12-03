@@ -59,8 +59,8 @@ clinicaltrials_search <-
 
 frame_studylist <- function(listitem){
 
-  if(names(listitem) %in% c("query", ".attrs")) return(NULL)
+  if(names(listitem) %in% c("query", ".attrs", "comment")) return(NULL)
 
-  as.data.frame(listitem[[1]], stringsAsFactors = FALSE)
+  as.data.frame(t(listitem[[1]]), stringsAsFactors = FALSE)
 
 }
