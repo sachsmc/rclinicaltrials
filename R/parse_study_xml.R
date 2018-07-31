@@ -17,12 +17,28 @@
 #'   frames will be \code{NULL} if not requested.
 #'
 
-parse_study_xml <- function(file, include_textblocks = FALSE, include_results = FALSE){
+parse_study_xml <- function(file, include_textblocks = FALSE, include_results = FALSE, verbose = FALSE){
 
+  if (verbose == TRUE) message(paste("Processing", file)) # identify which file throws error
   parsed <- XML::xmlParse(file)
 
   date_disclaimer <- XML::xmlValue(parsed[["//download_date"]])
-  ids <- as.data.frame(XML::xmlToList(parsed[["//id_info"]])[c("org_study_id", "nct_id")], stringsAsFactors = FALSE)
+
+  ids <- tryCatch(
+    {
+      # Some XML files don't contain org_study_id, which will throw an error
+      as.data.frame(XML::xmlToList(parsed[["//id_info"]])[c("org_study_id", "nct_id")], stringsAsFactors = FALSE)
+    },
+    error = function(error_condition) {
+      message(paste("File", file, "encountered the following error:", error_condition))
+      return(NULL)
+    }
+  )
+
+    # If the XML file threw an org_study_id error, omit org_study_id
+    if (is.null(ids)) {
+      ids <- as.data.frame(XML::xmlToList(parsed[["//id_info"]])[c("nct_id")], stringsAsFactors = FALSE)
+    }
 
   ## basic study info
 

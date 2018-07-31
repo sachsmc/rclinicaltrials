@@ -33,7 +33,7 @@
 #' \dontrun{clinicaltrials_download(query = list(recr='Open', type='Intr', cond='melanoma'))}
 #'
 clinicaltrials_download <-
-  function(query = NULL, tframe = NULL, count = 20, include_results = FALSE, include_textblocks = FALSE)
+  function(query = NULL, tframe = NULL, count = 20, include_results = FALSE, include_textblocks = FALSE, parallel = TRUE, verbose = FALSE)
   {
 
     if(!is.integer(as.integer(count))) stop("Count must be a number or NULL")
@@ -145,7 +145,24 @@ clinicaltrials_download <-
     # get files list
 
     xml_list <- stats::na.omit(unzipped.files[1:min(tcount, count)]) # drops NAs if number of downloaded files is smaller than search list
-    info_list <- lapply(xml_list, parse_study_xml, include_textblocks)
+    xml_list <- sort(xml_list)
+    if (verbose == T) message(paste("Downloaded", length(xml_list), "XML files. Processing may take some time..."))
+
+    # Use parallel processing, if available
+    if (requireNamespace("parallel", quietly = TRUE) & parallel == TRUE) {
+      cores <- parallel::detectCores()
+      cores <- ifelse(
+        ! is.na(cores),
+        cores,
+        1 # detectCores can return NA, so default to 1
+      )
+      if (verbose == T) message(paste("Processing using", cores, "cores."))
+      cl <- parallel::makeCluster(cores)
+      info_list <- parallel::mclapply(xml_list, parse_study_xml, include_textblocks, verbose = verbose)
+      parallel::stopCluster(cl)
+    } else {
+      info_list <- lapply(xml_list, parse_study_xml, include_textblocks, verbose = verbose)
+    }
 
     if(include_results) {
 
@@ -165,5 +182,3 @@ clinicaltrials_download <-
 
     }
   }
-
-
