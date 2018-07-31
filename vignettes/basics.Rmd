@@ -61,7 +61,7 @@ head(advanced_search_terms)
 To download detailed study information, including results, use `clinicaltrials_download()`:
 
 ```{r}
-y <- clinicaltrials_download(query = 'myeloma', count = 10, include_results = TRUE)
+y <- clinicaltrials_download(query = 'myeloma', count = 10, include_results = TRUE, parallel = FALSE)
 str(y)
 ```
 

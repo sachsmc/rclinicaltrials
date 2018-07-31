@@ -4,13 +4,15 @@
 \alias{clinicaltrials_search}
 \title{Search for clinical trials satisfying a query}
 \usage{
-clinicaltrials_search(query = NULL, count = 20)
+clinicaltrials_search(query = NULL, count = 20, verbose = FALSE)
 }
 \arguments{
 \item{query}{Search pattern as a string; a vector of key-value pairs is
 interpreted as an advanced search and is therefore combined with '&'}
 
 \item{count}{Limit the results to a specified integer. Set to NULL to include all results.}
+
+\item{verbose}{Defaults to FALSE. Set to TRUE to show individual list items for each study. For debugging use only.}
 }
 \value{
 A \code{data.frame} with the following columns: NCT study identifier, url, study title, status, condition summary, and date last changed
@@ -30,4 +32,3 @@ Searches for results and returns a \code{data.frame} with basic study informatio
 
 
 }
-
