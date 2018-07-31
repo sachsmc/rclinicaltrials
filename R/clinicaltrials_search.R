@@ -22,7 +22,7 @@
 #'
 #'
 clinicaltrials_search <-
-  function(query = NULL, count = 20)
+  function(query = NULL, count = 20, verbose = FALSE)
   {
     query_url <- "http://clinicaltrials.gov/ct2/results?"
 
@@ -45,7 +45,7 @@ clinicaltrials_search <-
     if(result_list$.attrs == "0") stop("Search returned 0 results")
     #convert to data.frame
 
-    result_frame <- do.call(plyr::rbind.fill, lapply(1:length(result_list), function(i) frame_studylist(result_list[i])))
+    result_frame <- do.call(plyr::rbind.fill, lapply(1:length(result_list), function(i) frame_studylist(result_list[i], verbose = verbose)))
     result_frame$order <- NULL
     result_frame$status..attrs <- NULL
     rownames(result_frame) <- result_frame$nct_id
@@ -57,10 +57,17 @@ clinicaltrials_search <-
 
 # result list processing
 
-frame_studylist <- function(listitem){
+frame_studylist <- function(listitem, verbose = FALSE){
 
-  if(names(listitem) %in% c("query", ".attrs")) return(NULL)
+  if (verbose == TRUE) message(listitem)
 
-  as.data.frame(listitem[[1]], stringsAsFactors = FALSE)
+  if(names(listitem) %in% c("query", ".attrs", "comment")) return(NULL)
+
+  if (names(listitem) %in% c("clinical_study")) {
+    listitem$clinical_study[sapply(listitem$clinical_study, is.null)] <- NULL # removes NULL comments from XML file that throw error
+    as.data.frame(listitem[[1]], stringsAsFactors = FALSE)
+  } else {
+    message(paste("Not handling", names(listitem), "."))
+  }
 
 }
