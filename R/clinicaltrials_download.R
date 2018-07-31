@@ -14,9 +14,11 @@
 #'   \link{clinicaltrials_search}
 #' @param count Limit the results to a specified integer. Set to NULL to include
 #'   all results.
-#' @param include_results Logical. Include results of completed trials
+#' @param include_results Logical. Include results of completed trials.
 #' @param include_textblocks Logical. Include lengthy text descriptions and
 #'   eligibility criteria.
+#' @param parallel Logical. Uses parallel processing of XML files is the parallel package is installed.
+#' @param verbose Logical. TRUE shows unzipped XML file names for debugging use. Passes to parse_study_xml.
 #'
 #' @export
 #' @importFrom utils unzip

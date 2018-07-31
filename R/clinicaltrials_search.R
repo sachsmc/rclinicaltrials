@@ -5,6 +5,7 @@
 #' @param query Search pattern as a string; a vector of key-value pairs is
 #'   interpreted as an advanced search and is therefore combined with '&'
 #' @param count Limit the results to a specified integer. Set to NULL to include all results.
+#' @param verbose Defaults to FALSE. Set to TRUE to show individual list items for each study. For debugging use only.
 #'
 #' @export
 #'

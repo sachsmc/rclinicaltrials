@@ -10,6 +10,7 @@
 #' @param include_textblocks Logical, include long textblock fields in the
 #'   results
 #' @param include_results Logical, include results data, if available
+#' @param verbose Logical, shows which file is processing for debugging purposes.
 #' @keywords Internal
 #'
 #' @return A list of \code{data.frame}s, study information, locations,
