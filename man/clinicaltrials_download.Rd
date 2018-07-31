@@ -5,7 +5,8 @@
 \title{Downloads detailed information about clinical trials satisfying a query}
 \usage{
 clinicaltrials_download(query = NULL, tframe = NULL, count = 20,
-  include_results = FALSE, include_textblocks = FALSE)
+  include_results = FALSE, include_textblocks = FALSE, parallel = TRUE,
+  verbose = FALSE)
 }
 \arguments{
 \item{query}{Search pattern as a string; a vector of key-value pairs is
@@ -17,10 +18,14 @@ interpreted as an advanced search and is therefore combined with '&'}
 \item{count}{Limit the results to a specified integer. Set to NULL to include
 all results.}
 
-\item{include_results}{Logical. Include results of completed trials}
+\item{include_results}{Logical. Include results of completed trials.}
 
 \item{include_textblocks}{Logical. Include lengthy text descriptions and
 eligibility criteria.}
+
+\item{parallel}{Logical. Uses parallel processing of XML files is the parallel package is installed.}
+
+\item{verbose}{Logical. TRUE shows unzipped XML file names for debugging use. Passes to parse_study_xml.}
 }
 \value{
 A list of \code{data.frame}s.
@@ -45,4 +50,3 @@ warning. To return all results, use a query string and set count to NULL.
 \dontrun{clinicaltrials_download(query = list(recr='Open', type='Intr', cond='melanoma'))}
 
 }
-

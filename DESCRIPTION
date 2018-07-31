@@ -30,4 +30,4 @@ Suggests:
     ggplot2
 VignetteBuilder: knitr
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

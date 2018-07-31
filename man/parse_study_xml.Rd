@@ -5,7 +5,8 @@
 \title{Parses study information for a trial downloaded from
 clinicaltrials.gov}
 \usage{
-parse_study_xml(file, include_textblocks = FALSE, include_results = FALSE)
+parse_study_xml(file, include_textblocks = FALSE, include_results = FALSE,
+  verbose = FALSE)
 }
 \arguments{
 \item{file}{Path to xml file}
@@ -14,6 +15,8 @@ parse_study_xml(file, include_textblocks = FALSE, include_results = FALSE)
 results}
 
 \item{include_results}{Logical, include results data, if available}
+
+\item{verbose}{Logical, shows which file is processing for debugging purposes.}
 }
 \value{
 A list of \code{data.frame}s, study information, locations,
@@ -27,4 +30,3 @@ and returns it as a list of dataframes. Optionally includes long textblock
 fields and results fields stored as separate data frames.
 }
 \keyword{Internal}
-
