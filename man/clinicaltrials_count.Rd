@@ -28,4 +28,3 @@ attempting to pull down a very large number of records.
 \dontrun{clinicaltrials_count(query = list(recr='Open', type='Intr', cond='melanoma'))}
 
 }
-

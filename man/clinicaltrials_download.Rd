@@ -45,4 +45,3 @@ warning. To return all results, use a query string and set count to NULL.
 \dontrun{clinicaltrials_download(query = list(recr='Open', type='Intr', cond='melanoma'))}
 
 }
-

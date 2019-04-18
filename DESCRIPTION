@@ -15,6 +15,7 @@ Maintainer: Michael C Sachs <sachsmc@gmail.com>
 Depends:
     R (>= 3.0.0)
 License: MIT + file LICENSE
+Encoding: UTF-8
 Imports:
     httr,
     XML,
@@ -30,4 +31,4 @@ Suggests:
     ggplot2
 VignetteBuilder: knitr
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.0

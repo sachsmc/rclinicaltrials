@@ -18,4 +18,3 @@ Results of a clinical study are stored in a particular way. This reads and
 organizes the information and returns it as a list of dataframes. Throws an error if the xml has no \code{clinical_results} node.
 }
 \keyword{Internal}
-
