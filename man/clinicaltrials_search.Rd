@@ -30,4 +30,3 @@ Searches for results and returns a \code{data.frame} with basic study informatio
 
 
 }
-

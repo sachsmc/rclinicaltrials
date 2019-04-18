@@ -26,8 +26,8 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
 
   ## basic study info
 
-  infoterms <- c("brief_title", "official_title", "overall_status", "start_date", "completion_date", "lead_sponsor/agency", "overall_official",
-                 "phase", "study_type", "study_design", "enrollment", "primary_condition", "primary_outcome", "eligibility", "sponsors")
+  infoterms <- c("brief_title", "official_title", "overall_status", "start_date", "primary_completion_date", "completion_date", "lead_sponsor/agency", "overall_official",
+                 "phase", "study_type", "allocation", "intervention_model", "primary_purpose", "masking", "enrollment", "primary_condition", "primary_outcome", "eligibility", "sponsors")
 
   study_info <- ids
 
@@ -57,6 +57,7 @@ parse_study_xml <- function(file, include_textblocks = FALSE, include_results = 
     study_info <- cbind(study_info, tmpField, stringsAsFactors = FALSE)
 
     if(infoterm == "completion_date") study_info["completion_date_type"] <- tryCatch(XML::xmlAttrs(parsed[[paste0("//", infoterm)]])["type"], error = function(e) NA)
+    if(infoterm == "primary_completion_date") study_info["primary_completion_date_type"] <- tryCatch(XML::xmlAttrs(parsed[[paste0("//", infoterm)]])["type"], error = function(e) NA)
 
   }
   }
